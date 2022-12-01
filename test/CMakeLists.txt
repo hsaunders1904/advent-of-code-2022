@@ -10,5 +10,5 @@ set(SRC
 add_executable(aoc-test ${SRC})
 target_link_libraries(aoc-test
   PRIVATE GTest::gtest_main
-  PRIVATE day01
+  PRIVATE aoc
 )

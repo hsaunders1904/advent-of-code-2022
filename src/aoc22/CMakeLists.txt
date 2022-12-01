@@ -1,2 +1,14 @@
-add_executable(day01 "day01.cpp")
-set_target_properties(day01 PROPERTIES ENABLE_EXPORTS ON)
+set(SRC
+  "day01.cpp"
+  "common.cpp"
+)
+add_library(aoc SHARED ${SRC} "aoc.h")
+
+set(EXES
+  "day01"
+)
+foreach(exe ${EXES})
+  add_executable(${exe} "${exe}.main.cpp")
+  target_link_libraries(${exe} PRIVATE aoc)
+endforeach()
+
