@@ -4,7 +4,7 @@ if (NOT ${GTest_FOUND})
 endif()
 
 set(SRC
-  "day01.test.cpp"
+  "aoc22.test.cpp"
 )
 
 add_executable(aoc-test ${SRC})
