@@ -23,7 +23,7 @@ int day02_2(std::istream *input_file) {
   int score{0};
   for (std::string line; std::getline(*input_file, line);) {
     int op = line[0] - 'A';
-    score += get_score((op + (line[2] - 'X' + 2) % 3) % 3, op);
+    score += get_score((op + line[2] - 'X' + 2) % 3, op);
   }
   return score;
 }
