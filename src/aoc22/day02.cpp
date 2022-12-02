@@ -8,9 +8,7 @@
  *  In addition, score 1 for rock, 2 for paper, 3 for scissors.
  */
 int get_score(const int player, const int opponent) {
-  // result: loss=2, win=1, loss=0
-  int result = (player - opponent + 3) % 3;
-  return 1 + player + ((result + 1) % 3) * 3;
+  return 1 + player + ((player - opponent + 4) % 3) * 3;
 }
 
 int day02_1(std::istream *input_file) {

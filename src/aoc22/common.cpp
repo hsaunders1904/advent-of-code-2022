@@ -1,5 +1,6 @@
 #include "aoc22/aoc.h"
 
+#include <string>
 #include <vector>
 
 std::ifstream open_file(const std::string &path) {
