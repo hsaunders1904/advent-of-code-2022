@@ -1,31 +1,31 @@
 #include "aoc22/aoc.h"
 
-constexpr int OP_SCORE_CHAR_OFFSET = 23;
-constexpr int SCORE_CHAR_OFFSET = 87;
-constexpr int SCORE_WIN = 6;
-constexpr int SCORE_DRAW = 3;
-
-int get_score(const char player, const char opponent) {
-  // Contribution to score from choice 1 - rock, 2 - paper, 3 - scissors
-  int score = player - SCORE_CHAR_OFFSET;
-  // Using the scores above to represent the choices, there are 6 cases when we
-  // subtract the opponent's score from the players':
-  // -2 (rock - scissors, player wins), -1 (rock - paper, paper - scissors,
-  // loss) and so on. 0 is obviously a draw, and wins come with a difference of
-  // -2 or 1.
-  int diff = player - opponent - OP_SCORE_CHAR_OFFSET;
-  if (diff == -2 || diff == 1) {
-    score += SCORE_WIN;
-  } else if (diff == 0) {
-    score += SCORE_DRAW;
-  }
-  return score;
+/**
+ * @brief Get the score for the given rock-paper-scissor choices.
+ *  0=rock, 1=paper, 2=scissors
+ *
+ *  Score 0 for a loss, 3 for a draw, 6 for a win.
+ *  In addition, score 1 for rock, 2 for paper, 3 for scissors.
+ */
+int get_score(const int player, const int opponent) {
+  // result: loss=2, win=1, loss=0
+  int result = (player - opponent + 3) % 3;
+  return 1 + player + ((result + 1) % 3) * 3;
 }
 
 int day02_1(std::istream *input_file) {
   int score{0};
   for (std::string line; std::getline(*input_file, line);) {
-    score += get_score(line[2], line[0]);
+    score += get_score(line[2] - 'X', line[0] - 'A');
+  }
+  return score;
+}
+
+int day02_2(std::istream *input_file) {
+  int score{0};
+  for (std::string line; std::getline(*input_file, line);) {
+    int op = line[0] - 'A';
+    score += get_score((op + (line[2] - 'X' + 2) % 3) % 3, op);
   }
   return score;
 }
