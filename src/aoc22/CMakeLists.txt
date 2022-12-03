@@ -1,10 +1,8 @@
 set(DAYS "01" "02" "03")
-set(SRC "common.cpp")
 foreach(day ${DAYS})
   list(APPEND SRC "day${day}.cpp")
-  list(APPEND EXE "day${day}.main.cpp")
-  add_executable(day${day} "day${day}.main.cpp")
-  target_link_libraries(day${day} PRIVATE aoc)
+  add_executable("day${day}" "day${day}.main.cpp")
+  target_link_libraries("day${day}" PRIVATE aoc)
 endforeach()
 
-add_library(aoc SHARED ${SRC} "aoc.h")
+add_library(aoc SHARED ${SRC} "aoc.cpp" "aoc.h")
