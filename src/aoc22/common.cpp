@@ -4,7 +4,6 @@
 
 #include <iostream>
 #include <string>
-#include <vector>
 
 namespace {
 struct Opts {
@@ -46,17 +45,7 @@ std::ifstream open_file(const std::string &path) {
   return stream;
 }
 
-std::string parse_one_cli_arg(int argc, char *argv[]) {
-  std::vector<std::string> args(argv, argv + argc);
-  if (args.size() != 2) {
-    throw std::runtime_error(
-        "must provide exactly one argument on command line. Found " +
-        std::to_string(args.size() - 1) + ".");
-  }
-  return args[1];
-}
-
-int run_day(int argc, char *argv[], day_func part_1, day_func part_2) {
+int run_day(int argc, char *argv[], day_function part_1, day_function part_2) {
   auto args = parse_args(argc, argv);
   auto stream = open_file(args.data_file);
   if (args.part_1) {
