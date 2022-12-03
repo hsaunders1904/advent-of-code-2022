@@ -30,7 +30,7 @@ int day01_2(std::istream *input_file) {
       current_count += std::stoi(line);
     }
   }
-  std::partial_sort(counts.begin(), counts.begin() + 3, counts.end(),
+  std::partial_sort(counts.begin(), std::next(counts.begin(), 3), counts.end(),
                     std::greater<>());
-  return std::accumulate(counts.begin(), counts.begin() + 3, 0);
+  return std::accumulate(counts.begin(), std::next(counts.begin(), 3), 0);
 }
