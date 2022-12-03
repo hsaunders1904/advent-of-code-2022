@@ -1,13 +1,5 @@
 #include "aoc22/aoc.h"
 
-#include <iostream>
-
 int main(int argc, char *argv[]) {
-  auto input_file = parse_one_cli_arg(argc, argv);
-  auto stream = open_file(input_file);
-  std::cout << day01_1(&stream) << std::endl;
-  stream.clear();
-  stream.seekg(0, std::ios::beg);
-  std::cout << day01_2(&stream) << std::endl;
-  return 0;
+  return run_day(argc, argv, day01_1, day01_2);
 }

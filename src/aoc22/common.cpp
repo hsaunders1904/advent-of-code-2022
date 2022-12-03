@@ -1,5 +1,6 @@
 #include "aoc22/aoc.h"
 
+#include <iostream>
 #include <string>
 #include <vector>
 
@@ -19,4 +20,14 @@ std::string parse_one_cli_arg(int argc, char *argv[]) {
         std::to_string(args.size() - 1) + ".");
   }
   return args[1];
+}
+
+int run_day(int argc, char *argv[], day_func part_1, day_func part_2) {
+  auto input_file = parse_one_cli_arg(argc, argv);
+  auto stream = open_file(input_file);
+  std::cout << part_1(&stream) << std::endl;
+  stream.clear();
+  stream.seekg(0, std::ios::beg);
+  std::cout << part_2(&stream) << std::endl;
+  return 0;
 }
