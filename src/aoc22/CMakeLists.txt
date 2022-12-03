@@ -1,4 +1,4 @@
-set(DAYS "01" "02")
+set(DAYS "01" "02" "03")
 set(SRC "common.cpp")
 foreach(day ${DAYS})
   list(APPEND SRC "day${day}.cpp")
