@@ -64,3 +64,9 @@ TEST(day04, Part1) {
 
   EXPECT_EQ(day04_1(&stream), 2);
 }
+
+TEST(day04, Part2) {
+  std::stringstream stream(data::day04);
+
+  EXPECT_EQ(day04_2(&stream), 4);
+}
