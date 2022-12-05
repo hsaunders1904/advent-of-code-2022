@@ -85,3 +85,9 @@ TEST(day05, Part1) {
 
   EXPECT_EQ(day05_1(&stream), "CMZ");
 }
+
+TEST(day05, Part2) {
+  std::stringstream stream(data::day05);
+
+  EXPECT_EQ(day05_2(&stream), "MCD");
+}

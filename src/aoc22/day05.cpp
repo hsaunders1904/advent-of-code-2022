@@ -30,8 +30,8 @@ std::vector<std::stack<char>> read_stacks(std::istream *input_file) {
   std::vector<std::stack<char>> ret_stacks;
   ret_stacks.resize(stacks.size());
   for (auto i = 0U; i < stacks.size(); ++i) {
-    for (auto j = stacks[i].size() - 1; stacks.size() > j; --j) {
-      ret_stacks[i].push(stacks[i][j]);
+    for (auto it = stacks[i].rbegin(); it != stacks[i].rend(); ++it) {
+      ret_stacks[i].push(*it);
     }
   }
   return ret_stacks;
@@ -77,4 +77,26 @@ std::string day05_1(std::istream *input_file) {
   return out;
 }
 
-std::string day05_2(std::istream *input_file) { return {}; }
+std::string day05_2(std::istream *input_file) {
+  auto stacks = read_stacks(input_file);
+  for (std::string line; std::getline(*input_file, line);) {
+    if (line.empty()) {
+      break;
+    }
+    auto [num_to_move, from, to] = parse_instruction(line);
+    std::vector<char> crates(num_to_move);
+    for (auto j = 0U; j < crates.size(); ++j) {
+      crates[j] = stacks[from].top();
+      stacks[from].pop();
+    }
+    for (auto it = crates.rbegin(); it != crates.rend(); ++it) {
+      stacks[to].push(*it);
+    }
+  }
+
+  std::string out;
+  for (const auto &stack : stacks) {
+    out += stack.top();
+  }
+  return out;
+}
