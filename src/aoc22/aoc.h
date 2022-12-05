@@ -67,3 +67,5 @@ int day03_1(std::istream *input_file);
 int day03_2(std::istream *input_file);
 int day04_1(std::istream *input_file);
 int day04_2(std::istream *input_file);
+std::string day05_1(std::istream *input_file);
+std::string day05_2(std::istream *input_file);

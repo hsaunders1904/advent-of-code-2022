@@ -21,6 +21,15 @@ constexpr auto day04 = "2-4,6-8\n"
                        "2-8,3-7\n"
                        "6-6,4-6\n"
                        "2-6,4-8\n";
+constexpr auto day05 = "    [D]    \n"
+                       "[N] [C]    \n"
+                       "[Z] [M] [P]\n"
+                       " 1   2   3 \n"
+                       "\n"
+                       "move 1 from 2 to 1\n"
+                       "move 3 from 1 to 3\n"
+                       "move 2 from 2 to 1\n"
+                       "move 1 from 1 to 2\n";
 } // namespace data
 
 TEST(day01, Part1) {
@@ -69,4 +78,10 @@ TEST(day04, Part2) {
   std::stringstream stream(data::day04);
 
   EXPECT_EQ(day04_2(&stream), 4);
+}
+
+TEST(day05, Part1) {
+  std::stringstream stream(data::day05);
+
+  EXPECT_EQ(day05_1(&stream), "CMZ");
 }
