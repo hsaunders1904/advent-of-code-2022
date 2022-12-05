@@ -41,6 +41,19 @@ inline Opts parse_args(int argc, char *argv[]) {
 } // namespace
 
 std::ifstream open_file(const std::string &path);
+std::vector<std::string> split(const std::string &str, const char split_on);
+
+int day01_1(std::istream *input_file);
+int day01_2(std::istream *input_file);
+int day02_1(std::istream *input_file);
+int day02_2(std::istream *input_file);
+int day03_1(std::istream *input_file);
+int day03_2(std::istream *input_file);
+int day04_1(std::istream *input_file);
+int day04_2(std::istream *input_file);
+std::string day05_1(std::istream *input_file);
+std::string day05_2(std::istream *input_file);
+
 template <typename T>
 int run_day(int argc, char *argv[], day_function<T> part_1,
             day_function<T> part_2) {
@@ -58,14 +71,3 @@ int run_day(int argc, char *argv[], day_function<T> part_1,
   }
   return 0;
 }
-
-int day01_1(std::istream *input_file);
-int day01_2(std::istream *input_file);
-int day02_1(std::istream *input_file);
-int day02_2(std::istream *input_file);
-int day03_1(std::istream *input_file);
-int day03_2(std::istream *input_file);
-int day04_1(std::istream *input_file);
-int day04_2(std::istream *input_file);
-std::string day05_1(std::istream *input_file);
-std::string day05_2(std::istream *input_file);
