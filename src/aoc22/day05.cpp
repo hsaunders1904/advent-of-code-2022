@@ -1,5 +1,7 @@
 #include "aoc22/aoc.h"
 
+#include <array>
+#include <numeric>
 #include <stack>
 
 namespace {
