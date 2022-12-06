@@ -2,33 +2,43 @@
 
 namespace {
 bool has_no_duplicates(const std::array<int, 26> &counts,
-                       const std::string &signal, std::size_t start_idx) {
+                       const std::string &signal, std::size_t start_idx,
+                       std::size_t window_size) {
 
   auto it = std::next(signal.begin(), start_idx);
-  return std::all_of(it, std::next(it, 4),
+  return std::all_of(it, std::next(it, window_size),
                      [&counts](auto ch) { return counts[ch - 'a'] == 1; });
 }
-} // namespace
 
-int day06_1(std::istream *input_file) {
-  std::string signal;
-  std::getline(*input_file, signal);
-
+int find_distinct_char_idx(const std::string &signal, std::size_t window_size) {
   std::array<int, 26> char_counts{0};
-  for (auto i = 0U; i < 4; ++i) {
+  for (auto i = 0U; i < window_size; ++i) {
     char_counts[signal[i] - 'a']++;
   }
-  if (has_no_duplicates(char_counts, signal, 4)) {
-    return 4;
+  if (has_no_duplicates(char_counts, signal, window_size, window_size)) {
+    return window_size;
   }
-  for (auto i = 4U; i < signal.size(); ++i) {
-    char_counts[signal[i - 4] - 'a']--;
+  for (auto i = window_size; i < signal.size(); ++i) {
+    char_counts[signal[i - window_size] - 'a']--;
     char_counts[signal[i] - 'a']++;
-    if (has_no_duplicates(char_counts, signal, i - 3)) {
+    if (has_no_duplicates(char_counts, signal, i - window_size + 1,
+                          window_size)) {
       return i + 1;
     }
   }
   return -1;
 }
 
-int day06_2(std::istream *input_file) { return 0; }
+} // namespace
+
+int day06_1(std::istream *input_file) {
+  std::string signal;
+  std::getline(*input_file, signal);
+  return find_distinct_char_idx(signal, 4);
+}
+
+int day06_2(std::istream *input_file) {
+  std::string signal;
+  std::getline(*input_file, signal);
+  return find_distinct_char_idx(signal, 14);
+}

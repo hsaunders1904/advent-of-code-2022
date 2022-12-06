@@ -121,3 +121,33 @@ TEST(day06, Part1_5) {
 
   EXPECT_EQ(day06_1(&stream), 11);
 }
+
+TEST(day06, Part2_1) {
+  std::stringstream stream("mjqjpqmgbljsphdztnvjfqwrcgsmlb");
+
+  EXPECT_EQ(day06_2(&stream), 19);
+}
+
+TEST(day06, Part2_2) {
+  std::stringstream stream("bvwbjplbgvbhsrlpgdmjqwftvncz");
+
+  EXPECT_EQ(day06_2(&stream), 23);
+}
+
+TEST(day06, Part2_3) {
+  std::stringstream stream("nppdvjthqldpwncqszvftbrmjlhg");
+
+  EXPECT_EQ(day06_2(&stream), 23);
+}
+
+TEST(day06, Part2_4) {
+  std::stringstream stream("nznrnfrfntjfmvfwmzdfjlvtqnbhcprsg");
+
+  EXPECT_EQ(day06_2(&stream), 29);
+}
+
+TEST(day06, Part2_5) {
+  std::stringstream stream("zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw");
+
+  EXPECT_EQ(day06_2(&stream), 26);
+}
