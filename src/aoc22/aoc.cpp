@@ -2,14 +2,6 @@
 
 #include <argparse/argparse.hpp>
 
-std::ifstream open_file(const std::string &path) {
-  std::ifstream stream(path);
-  if (!stream.is_open()) {
-    throw std::runtime_error("could not open file '" + path + "'.");
-  }
-  return stream;
-}
-
 std::vector<std::string> split(const std::string &str, const char split_on) {
   std::vector<std::string> parts;
   std::stringstream ss(str);
@@ -17,6 +9,15 @@ std::vector<std::string> split(const std::string &str, const char split_on) {
     parts.emplace_back(part);
   }
   return parts;
+}
+
+namespace details {
+std::ifstream open_file(const std::string &path) {
+  std::ifstream stream(path);
+  if (!stream.is_open()) {
+    throw std::runtime_error("could not open file '" + path + "'.");
+  }
+  return stream;
 }
 
 Opts parse_args(int argc, char *argv[]) {
@@ -42,3 +43,4 @@ Opts parse_args(int argc, char *argv[]) {
   auto part_2 = parser.get<bool>("part2");
   return {data_file, part_1 || !part_2, part_2 || !part_1};
 }
+} // namespace details
