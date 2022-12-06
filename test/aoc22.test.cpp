@@ -91,3 +91,33 @@ TEST(day05, Part2) {
 
   EXPECT_EQ(day05_2(&stream), "MCD");
 }
+
+TEST(day06, Part1_1) {
+  std::stringstream stream("mjqjpqmgbljsphdztnvjfqwrcgsmlb");
+
+  EXPECT_EQ(day06_1(&stream), 7);
+}
+
+TEST(day06, Part1_2) {
+  std::stringstream stream("bvwbjplbgvbhsrlpgdmjqwftvncz");
+
+  EXPECT_EQ(day06_1(&stream), 5);
+}
+
+TEST(day06, Part1_3) {
+  std::stringstream stream("nppdvjthqldpwncqszvftbrmjlhg");
+
+  EXPECT_EQ(day06_1(&stream), 6);
+}
+
+TEST(day06, Part1_4) {
+  std::stringstream stream("nznrnfrfntjfmvfwmzdfjlvtqnbhcprsg");
+
+  EXPECT_EQ(day06_1(&stream), 10);
+}
+
+TEST(day06, Part1_5) {
+  std::stringstream stream("zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw");
+
+  EXPECT_EQ(day06_1(&stream), 11);
+}

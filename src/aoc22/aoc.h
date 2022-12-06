@@ -53,6 +53,8 @@ int day04_1(std::istream *input_file);
 int day04_2(std::istream *input_file);
 std::string day05_1(std::istream *input_file);
 std::string day05_2(std::istream *input_file);
+int day06_1(std::istream *input_file);
+int day06_2(std::istream *input_file);
 
 template <typename T>
 int run_day(int argc, char *argv[], day_function<T> part_1,
