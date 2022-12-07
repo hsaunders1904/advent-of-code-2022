@@ -4,6 +4,8 @@
 #include <map>
 #include <numeric>
 
+using str_vec_iterator = std::vector<std::string>::iterator;
+
 namespace {
 inline bool is_command(const std::vector<std::string> &line) {
   return line[0] == "$";
@@ -12,53 +14,44 @@ inline bool is_command(const std::vector<std::string> &line) {
 inline std::vector<std::string> read_line(std::istream *stream) {
   std::string line;
   std::getline(*stream, line);
-  if (line.empty()) {
-    return {};
-  }
   return split(line, ' ');
 }
 
-std::string strip_dir(const std::string &path) {
-  std::string new_path = path.substr(0, path.find_last_of('/'));
-  if (path[path.size() - 1] == '/') {
-    new_path = new_path.substr(0, new_path.find_last_of('/'));
+std::string to_string(str_vec_iterator begin, str_vec_iterator end) {
+  std::string out = "/";
+  for (; begin != end; begin++) {
+    out += *begin + "/";
   }
-  return new_path;
+  return out;
 }
 
 std::map<std::string, int> directory_sizes(std::istream *input_file) {
   std::map<std::string, int> dir_sizes;
-  std::string current_dir;
+  std::vector<std::string> current_dir;
   auto line = read_line(input_file);
-  while (true) {
-    if (line.empty()) {
-      break;
-    }
+  while (!input_file->eof()) {
     if (is_command(line)) {
       if (line[1] == "cd") {
         if (line[2] == "/") {
-          current_dir = "/";
+          current_dir = {};
         } else if (line[2] == "..") {
-          current_dir = strip_dir(current_dir) + "/";
+          current_dir.pop_back();
         } else {
-          current_dir += line[2] + "/";
+          current_dir.push_back(line[2]);
         }
         line = read_line(input_file);
       } else if (line[1] == "ls") {
-        while (true) {
-          line = read_line(input_file);
-          if (line.empty() || is_command(line)) {
-            break;
-          }
+        line = read_line(input_file);
+        while (!(line.empty() || is_command(line))) {
           if (line[0][0] != 'd') {
             const auto file_size = std::stoi(line[0]);
-            auto parts = split(current_dir, '/');
-            std::string dir_name = "";
-            for (auto i = 0U; i < parts.size(); ++i) {
-              dir_name += parts[i] + "/";
+            for (auto i = 0U; i < current_dir.size() + 1; ++i) {
+              auto dir_name = to_string(current_dir.begin(),
+                                        std::next(current_dir.begin(), i));
               dir_sizes[dir_name] += file_size;
             }
           }
+          line = read_line(input_file);
         }
       }
     }
@@ -68,21 +61,18 @@ std::map<std::string, int> directory_sizes(std::istream *input_file) {
 } // namespace
 
 int day07_1(std::istream *input_file) {
-  auto dir_sizes = directory_sizes(input_file);
-  int sums{0};
-  for (const auto &p : dir_sizes) {
-    if (p.second <= 100000) {
-      sums += p.second;
-    }
-  }
-  return sums;
+  const auto dir_sizes = directory_sizes(input_file);
+  return std::accumulate(dir_sizes.begin(), dir_sizes.end(), 0,
+                         [](const auto sum, const auto &pair) {
+                           return pair.second <= 1e5 ? sum + pair.second : sum;
+                         });
 }
 
 int day07_2(std::istream *input_file) {
   constexpr int disk_space{70000000};
   constexpr int space_needed{30000000};
-  auto dir_sizes = directory_sizes(input_file);
-  auto space_to_free = space_needed - (disk_space - dir_sizes.at("/"));
+  const auto dir_sizes = directory_sizes(input_file);
+  const auto space_to_free = space_needed - (disk_space - dir_sizes.at("/"));
 
   auto dir_size_to_delete = std::numeric_limits<int>().max();
   for (const auto &[dir_name, dir_size] : dir_sizes) {
