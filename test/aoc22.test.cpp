@@ -30,6 +30,29 @@ constexpr auto day05 = "    [D]    \n"
                        "move 3 from 1 to 3\n"
                        "move 2 from 2 to 1\n"
                        "move 1 from 1 to 2\n";
+constexpr auto day07 = "$ cd /\n"
+                       "$ ls\n"
+                       "dir a\n"
+                       "14848514 b.txt\n"
+                       "8504156 c.dat\n"
+                       "dir d\n"
+                       "$ cd a\n"
+                       "$ ls\n"
+                       "dir e\n"
+                       "29116 f\n"
+                       "2557 g\n"
+                       "62596 h.lst\n"
+                       "$ cd e\n"
+                       "$ ls\n"
+                       "584 i\n"
+                       "$ cd ..\n"
+                       "$ cd ..\n"
+                       "$ cd d\n"
+                       "$ ls\n"
+                       "4060174 j\n"
+                       "8033020 d.log\n"
+                       "5626152 d.ext\n"
+                       "7214296 k\n";
 } // namespace data
 
 TEST(day01, Part1) {
@@ -150,4 +173,10 @@ TEST(day06, Part2_5) {
   std::stringstream stream("zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw");
 
   EXPECT_EQ(day06_2(&stream), 26);
+}
+
+TEST(day07, Part1) {
+  std::stringstream stream(data::day07);
+
+  EXPECT_EQ(day07_1(&stream), 95437);
 }
