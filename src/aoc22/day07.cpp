@@ -1,6 +1,8 @@
 #include "aoc22/aoc.h"
 
+#include <limits>
 #include <map>
+#include <numeric>
 
 namespace {
 inline bool is_command(const std::vector<std::string> &line) {
@@ -24,9 +26,7 @@ std::string strip_dir(const std::string &path) {
   return new_path;
 }
 
-} // namespace
-
-int day07_1(std::istream *input_file) {
+std::map<std::string, int> directory_sizes(std::istream *input_file) {
   std::map<std::string, int> dir_sizes;
   std::string current_dir;
   auto line = read_line(input_file);
@@ -63,9 +63,14 @@ int day07_1(std::istream *input_file) {
       }
     }
   }
+  return dir_sizes;
+}
+} // namespace
+
+int day07_1(std::istream *input_file) {
+  auto dir_sizes = directory_sizes(input_file);
   int sums{0};
   for (const auto &p : dir_sizes) {
-    std::cout << p.first << ": " << p.second << "\n";
     if (p.second <= 100000) {
       sums += p.second;
     }
@@ -73,4 +78,17 @@ int day07_1(std::istream *input_file) {
   return sums;
 }
 
-int day07_2(std::istream *input_file) { return 1; }
+int day07_2(std::istream *input_file) {
+  constexpr int disk_space{70000000};
+  constexpr int space_needed{30000000};
+  auto dir_sizes = directory_sizes(input_file);
+  auto space_to_free = space_needed - (disk_space - dir_sizes.at("/"));
+
+  auto dir_size_to_delete = std::numeric_limits<int>().max();
+  for (const auto &[dir_name, dir_size] : dir_sizes) {
+    if (dir_size < dir_size_to_delete && dir_size >= space_to_free) {
+      dir_size_to_delete = dir_size;
+    }
+  }
+  return dir_size_to_delete;
+}
