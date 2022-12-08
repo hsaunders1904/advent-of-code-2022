@@ -23,6 +23,8 @@ int day06_1(std::istream *input_file);
 int day06_2(std::istream *input_file);
 int day07_1(std::istream *input_file);
 int day07_2(std::istream *input_file);
+int day08_1(std::istream *input_file);
+int day08_2(std::istream *input_file);
 
 std::vector<std::string> split(const std::string &str, const char split_on);
 

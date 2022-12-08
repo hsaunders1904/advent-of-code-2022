@@ -53,6 +53,12 @@ constexpr auto day07 = "$ cd /\n"
                        "8033020 d.log\n"
                        "5626152 d.ext\n"
                        "7214296 k\n";
+constexpr auto day08 = "30373\n"
+                       "25512\n"
+                       "65332\n"
+                       "33549\n"
+                       "35390\n";
+
 } // namespace data
 
 TEST(day01, Part1) {
@@ -185,4 +191,10 @@ TEST(day07, Part2) {
   std::stringstream stream(data::day07);
 
   EXPECT_EQ(day07_2(&stream), 24933642);
+}
+
+TEST(day08, Part1) {
+  std::stringstream stream(data::day08);
+
+  EXPECT_EQ(day08_1(&stream), 21);
 }
