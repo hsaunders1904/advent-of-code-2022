@@ -33,7 +33,6 @@ std::vector<std::stack<char>> read_stacks(std::istream *input_file) {
 }
 
 std::array<int, 3> parse_instruction(const std::string &line) {
-  std::array<int, 3> instruction;
   const auto parts = split(line, ' ');
   return {std::stoi(parts.at(1)), std::stoi(parts.at(3)) - 1,
           std::stoi(parts.at(5)) - 1};
@@ -44,7 +43,7 @@ std::string day05_1(std::istream *input_file) {
   auto stacks = read_stacks(input_file);
   for (std::string line; std::getline(*input_file, line);) {
     const auto [num_to_move, from, to] = parse_instruction(line);
-    for (auto i = 0U; i < num_to_move; ++i) {
+    for (auto i = 0; i < num_to_move; ++i) {
       stacks[to].push(stacks[from].top());
       stacks[from].pop();
     }
