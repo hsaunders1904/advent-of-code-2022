@@ -6,3 +6,4 @@ foreach(day ${DAYS})
 endforeach()
 
 add_library(aoc SHARED ${SRC} "aoc.cpp" "aoc.h")
+set_target_properties(aoc PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS ON)
