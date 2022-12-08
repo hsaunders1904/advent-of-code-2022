@@ -72,18 +72,69 @@ bool idx_visible(const std::vector<std::size_t> &mat, std::size_t row,
   }
   return false;
 }
+
+int idx_scenic_score(const std::vector<std::size_t> &mat, std::size_t row,
+                     std::size_t col, std::size_t width) {
+  auto el = mat[row * width + col];
+  std::array<int, 4> scores{0};
+
+  // Look left
+  for (std::size_t i = col - 1; i != static_cast<std::size_t>(-1); --i) {
+    auto other = mat[row * width + i];
+    scores[0] += 1;
+    if (other >= el) {
+      break;
+    }
+  }
+  // Look right
+  for (auto i = col + 1; i < width; ++i) {
+    auto other = mat[row * width + i];
+    scores[1] += 1;
+    if (other >= el) {
+      break;
+    }
+  }
+  // Look up
+  for (std::size_t i = row - 1; i != static_cast<std::size_t>(-1); --i) {
+    auto other = mat[i * width + col];
+    scores[2] += 1;
+    if (other >= el) {
+      break;
+    }
+  }
+  // Look down
+  for (auto i = row + 1; i < width; ++i) {
+    auto other = mat[i * width + col];
+    scores[3] += 1;
+    if (other >= el) {
+      break;
+    }
+  }
+  return std::accumulate(scores.begin(), scores.end(), 1, std::multiplies<>());
+}
 } // namespace
 
 int day08_1(std::istream *input_file) {
   const auto [heights, width] = read_matrix(input_file);
-  std::vector<bool> visible(heights.size(), true);
+  int num_visible = 4 * (width - 1);
   for (auto row_idx = 1U; row_idx < width - 1; ++row_idx) {
     for (auto col_idx = 1U; col_idx < width - 1; ++col_idx) {
-      visible[row_idx * width + col_idx] =
-          idx_visible(heights, row_idx, col_idx, width);
+      num_visible += idx_visible(heights, row_idx, col_idx, width);
     }
   }
-  return std::accumulate(visible.begin(), visible.end(), 0);
+  return num_visible;
 }
 
-int day08_2(std::istream *input_file) { return 1; }
+int day08_2(std::istream *input_file) {
+  const auto [heights, width] = read_matrix(input_file);
+  int max_scenic_score{0};
+  for (auto row_idx = 1U; row_idx < width - 1; ++row_idx) {
+    for (auto col_idx = 1U; col_idx < width - 1; ++col_idx) {
+      auto score = idx_scenic_score(heights, row_idx, col_idx, width);
+      if (score > max_scenic_score) {
+        max_scenic_score = score;
+      }
+    }
+  }
+  return max_scenic_score;
+}
