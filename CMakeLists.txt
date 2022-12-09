@@ -6,7 +6,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 
-if(MSVC)
+if(CXX_COMPILER_ID STREQUAL MSVC)
   add_compile_options("/W4")
 else()
   add_compile_options("-pedantic" "-Wall" "-Wextra")

@@ -58,15 +58,6 @@ constexpr auto day08 = "30373\n"
                        "65332\n"
                        "33549\n"
                        "35390\n";
-constexpr auto day09 = "R 4\n"
-                       "U 4\n"
-                       "L 3\n"
-                       "D 1\n"
-                       "R 4\n"
-                       "D 1\n"
-                       "L 5\n"
-                       "R 2\n";
-
 } // namespace data
 
 TEST(day01, Part1) {
@@ -214,7 +205,29 @@ TEST(day08, Part2) {
 }
 
 TEST(day09, Part1) {
-  std::stringstream stream(data::day09);
+  constexpr auto instructions = "R 4\n"
+                                "U 4\n"
+                                "L 3\n"
+                                "D 1\n"
+                                "R 4\n"
+                                "D 1\n"
+                                "L 5\n"
+                                "R 2\n";
+  std::stringstream stream(instructions);
 
   EXPECT_EQ(day09_1(&stream), 13);
+}
+
+TEST(day09, Part2) {
+  constexpr auto instructions = "R 5\n"
+                                "U 8\n"
+                                "L 8\n"
+                                "D 3\n"
+                                "R 17\n"
+                                "D 10\n"
+                                "L 25\n"
+                                "U 20\n";
+  std::stringstream stream(instructions);
+
+  EXPECT_EQ(day09_2(&stream), 36);
 }
