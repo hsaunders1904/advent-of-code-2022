@@ -42,8 +42,8 @@ Opts parse_args(int argc, char *argv[]);
 std::ifstream open_file(const std::string &path);
 } // namespace details
 
-template <typename T>
-int run_day(int argc, char *argv[], day_func<T> part_1, day_func<T> part_2) {
+template <typename T, typename U>
+int run_day(int argc, char *argv[], day_func<T> part_1, day_func<U> part_2) {
   auto args = details::parse_args(argc, argv);
   auto stream = details::open_file(args.data_file);
   if (args.part_1) {
