@@ -1,7 +1,5 @@
 #include "aoc22/aoc.h"
 
-#include <array>
-
 namespace {
 constexpr auto ADDX = "addx";
 
@@ -31,9 +29,38 @@ int day10_1(std::istream *input_file) {
       x_reg += value;
     }
   }
-
   return signal_strength_sum;
 }
 
-int day10_2(std::istream *input_file) { return 1; }
-
+std::string day10_2(std::istream *input_file) {
+  int x_reg{1};
+  int cycle_num{1};
+  std::string display;
+  for (std::string line; std::getline(*input_file, line); ++cycle_num) {
+    auto [instruction, value] = parse_instruction(line);
+    auto pixel_pos = (cycle_num - 1) % 40;
+    if (pixel_pos == 0 && cycle_num != 1) {
+      display += "\n";
+    }
+    if (pixel_pos >= x_reg - 1 && pixel_pos <= x_reg + 1) {
+      display += "#";
+    } else {
+      display += ".";
+    }
+    if (instruction == ADDX) {
+      cycle_num++;
+      pixel_pos = (cycle_num - 1) % 40;
+      if (pixel_pos == 0) {
+        display += "\n";
+      }
+      if (pixel_pos >= x_reg - 1 && pixel_pos <= x_reg + 1) {
+        display += "#";
+      } else {
+        display += ".";
+      }
+      x_reg += value;
+    }
+  }
+  display += "\n";
+  return display;
+}
