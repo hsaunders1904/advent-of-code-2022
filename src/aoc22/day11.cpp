@@ -113,9 +113,7 @@ u_int64_t simulate(std::vector<Monkey> &monkeys, std::size_t num_rounds,
   std::partial_sort(inspection_count.begin(),
                     std::next(inspection_count.begin(), 2),
                     inspection_count.end(), std::greater<>());
-  return std::accumulate(inspection_count.begin(),
-                         std::next(inspection_count.begin(), 2), 1U,
-                         std::multiplies<>());
+  return inspection_count[0] * inspection_count[1];
 }
 } // namespace
 
@@ -129,6 +127,9 @@ u_int64_t day11_2(std::istream *input_file) {
   u_int64_t divisor_prod = std::accumulate(
       monkeys.begin(), monkeys.end(), 1U,
       [](const auto &acc, const auto &m) { return acc * m.divisor; });
-  return simulate(monkeys, 10000,
-                  [divisor_prod](auto wl) { return wl % divisor_prod; });
+  // Use the fact that every divisor is a prime number. We can take the
+  // 'worry level' modulo the product of all the divisors, to get a smaller
+  // number that still has the same set of divisors.
+  auto wl_manager = [divisor_prod](auto wl) { return wl % divisor_prod; };
+  return simulate(monkeys, 10000, wl_manager);
 }
