@@ -95,22 +95,18 @@ std::vector<Monkey> read_monkeys(std::istream *input) {
   return monkeys;
 }
 
-} // namespace
-
-u_int64_t day11_1(std::istream *input_file) {
-  constexpr std::size_t num_rounds{20};
-
-  auto monkeys = read_monkeys(input_file);
-  std::vector<std::size_t> inspection_count(monkeys.size());
+u_int64_t simulate(std::vector<Monkey> &monkeys, std::size_t num_rounds,
+                   std::function<u_int64_t(u_int64_t)> wl_manager) {
+  std::vector<u_int64_t> inspection_count(monkeys.size());
   for (auto i = 0U; i < num_rounds; ++i) {
     for (auto m_idx = 0U; m_idx < monkeys.size(); ++m_idx) {
       while (monkeys[m_idx].items.size() > 0) {
         auto item_wl =
-            monkeys[m_idx].operation(monkeys[m_idx].items.front()) / 3;
+            wl_manager(monkeys[m_idx].operation(monkeys[m_idx].items.front()));
         inspection_count[m_idx]++;
         monkeys[m_idx].items.pop_front();
-        auto throw_to_monkey = monkeys[m_idx].test(item_wl);
-        monkeys[throw_to_monkey].items.push_back(item_wl);
+        auto throw_to = monkeys[m_idx].test(item_wl);
+        monkeys[throw_to].items.push_back(item_wl);
       }
     }
   }
@@ -118,38 +114,21 @@ u_int64_t day11_1(std::istream *input_file) {
                     std::next(inspection_count.begin(), 2),
                     inspection_count.end(), std::greater<>());
   return std::accumulate(inspection_count.begin(),
-                         std::next(inspection_count.begin(), 2), 1,
+                         std::next(inspection_count.begin(), 2), 1U,
                          std::multiplies<>());
+}
+} // namespace
+
+u_int64_t day11_1(std::istream *input_file) {
+  auto monkeys = read_monkeys(input_file);
+  return simulate(monkeys, 20, [](auto wl) { return wl / 3; });
 }
 
 u_int64_t day11_2(std::istream *input_file) {
-  constexpr std::size_t num_rounds{10000};
-
   auto monkeys = read_monkeys(input_file);
-  std::vector<u_int64_t> inspection_count(monkeys.size());
   u_int64_t divisor_prod = std::accumulate(
       monkeys.begin(), monkeys.end(), 1U,
       [](const auto &acc, const auto &m) { return acc * m.divisor; });
-  for (auto i = 0U; i < num_rounds; ++i) {
-    for (auto m_idx = 0U; m_idx < monkeys.size(); ++m_idx) {
-      while (monkeys[m_idx].items.size() > 0) {
-        auto item_wl = monkeys[m_idx].operation(monkeys[m_idx].items.front());
-        inspection_count[m_idx]++;
-        monkeys[m_idx].items.pop_front();
-
-        // Use the fact that every divisor is a prime number. We can take
-        // the modulo of the product of all divisors to get a smaller number
-        // with the same divisors.
-        auto new_wl = item_wl % divisor_prod;
-        auto throw_to_monkey = monkeys[m_idx].test(new_wl);
-        monkeys[throw_to_monkey].items.push_back(new_wl);
-      }
-    }
-  }
-  std::partial_sort(inspection_count.begin(),
-                    std::next(inspection_count.begin(), 2),
-                    inspection_count.end(), std::greater<>());
-  return std::accumulate(
-      inspection_count.begin(), std::next(inspection_count.begin(), 2),
-      static_cast<u_int64_t>(1), std::multiplies<u_int64_t>());
+  return simulate(monkeys, 10000,
+                  [divisor_prod](auto wl) { return wl % divisor_prod; });
 }
