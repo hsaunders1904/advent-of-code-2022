@@ -12,6 +12,11 @@ struct Monkey {
   u_int64_t divisor;
 };
 
+void getline_with_trim(std::istream *input, std::string *line) {
+  std::getline(*input, *line);
+  trim(line);
+}
+
 std::list<u_int64_t> parse_items(const std::string &line) {
   auto str_items = split(split(line, ':')[1], ',');
   std::list<u_int64_t> items(str_items.size());
@@ -45,17 +50,12 @@ std::function<u_int64_t(u_int64_t)> parse_operation(const std::string &line) {
 std::pair<std::function<std::size_t(u_int64_t)>, u_int64_t>
 parse_test(std::istream *input) {
   std::string line;
-  std::getline(*input, line);
-  trim(&line);
+  getline_with_trim(input, &line);
   auto parts = split(line, ' ')[3];
   auto divisor = std::stoi(split(line, ' ')[3]);
-
-  std::getline(*input, line);
-  trim(&line);
+  getline_with_trim(input, &line);
   std::size_t true_monkey = std::stoul(split(line, ' ')[5]);
-
-  std::getline(*input, line);
-  trim(&line);
+  getline_with_trim(input, &line);
   std::size_t false_monkey = std::stoul(split(line, ' ')[5]);
   auto test_func = [divisor, true_monkey, false_monkey](const u_int64_t x) {
     if (x % divisor == 0) {
@@ -73,12 +73,10 @@ Monkey read_monkey(std::istream *input) {
   // Ignore first line, giving monkey no.
   std::getline(*input, line);
   // Starting items
-  std::getline(*input, line);
-  trim(&line);
+  getline_with_trim(input, &line);
   monkey.items = parse_items(line);
   // Operation
-  std::getline(*input, line);
-  trim(&line);
+  getline_with_trim(input, &line);
   monkey.operation = parse_operation(line);
   // Test
   auto [tester, divisor] = parse_test(input);
@@ -89,10 +87,10 @@ Monkey read_monkey(std::istream *input) {
 
 std::vector<Monkey> read_monkeys(std::istream *input) {
   std::vector<Monkey> monkeys;
-  std::string _ignore;
+  std::string _empty_line_ignore;
   while (!input->eof()) {
     monkeys.emplace_back(read_monkey(input));
-    std::getline(*input, _ignore);
+    std::getline(*input, _empty_line_ignore);
   }
   return monkeys;
 }
