@@ -1,4 +1,4 @@
-set(DAYS "01" "02" "03" "04" "05" "06" "07" "08" "09" "10")
+set(DAYS "01" "02" "03" "04" "05" "06" "07" "08" "09" "10" "11")
 foreach(day ${DAYS})
   list(APPEND SRC "day${day}.cpp")
   add_executable("day${day}" "day${day}.main.cpp")

@@ -11,6 +11,24 @@ std::vector<std::string> split(const std::string &str, const char split_on) {
   return parts;
 }
 
+void ltrim(std::string *str) {
+  str->erase(str->begin(),
+             std::find_if(str->begin(), str->end(),
+                          [](unsigned char ch) { return std::isalnum(ch); }));
+}
+
+void rtrim(std::string *str) {
+  str->erase(std::find_if(str->rbegin(), str->rend(),
+                          [](unsigned char ch) { return std::isalnum(ch); })
+                 .base(),
+             str->end());
+}
+
+void trim(std::string *str) {
+  ltrim(str);
+  rtrim(str);
+}
+
 namespace details {
 std::ifstream open_file(const std::string &path) {
   std::ifstream stream(path);
