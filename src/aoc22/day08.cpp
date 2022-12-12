@@ -12,9 +12,8 @@ std::tuple<std::vector<std::size_t>, std::size_t> read_matrix(std::istream *inpu
       break;
     }
     width = line.size();
-    for (const char ch : line) {
-      heights.emplace_back(ch - '0');
-    }
+    std::transform(line.begin(), line.end(), std::back_inserter(heights),
+                   [](auto ch) { return ch - '0'; });
   }
   return {heights, width};
 }

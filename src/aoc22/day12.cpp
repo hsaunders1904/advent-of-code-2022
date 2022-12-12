@@ -7,9 +7,9 @@
 namespace {
 struct Landscape {
   std::vector<std::size_t> elevation;
-  std::size_t start;
-  std::size_t end;
-  std::size_t width;
+  std::size_t start{0};
+  std::size_t end{0};
+  std::size_t width{0};
 
   void invert_elevations() {
     std::transform(elevation.begin(), elevation.end(), elevation.begin(),
@@ -68,23 +68,23 @@ breadth_first_search(const std::vector<std::set<std::size_t>> &adjacency,
   queue.push(start);
   std::vector<bool> explored(adjacency.size(), false);
   explored[start] = true;
-  std::vector<std::size_t> distances(adjacency.size(), 0);
+  std::vector<std::size_t> distance_to(adjacency.size(), 0);
 
   while (!queue.empty()) {
-    auto u = queue.front();
+    auto node = queue.front();
     queue.pop();
-    if (target && u == target) {
-      return {distances[u]};
+    if (target && node == target) {
+      return {distance_to[node]};
     }
-    for (auto neighbour : adjacency[u]) {
+    for (auto neighbour : adjacency[node]) {
       if (!explored[neighbour]) {
         queue.push(neighbour);
         explored[neighbour] = true;
-        distances[neighbour] = distances[u] + 1;
+        distance_to[neighbour] = distance_to[node] + 1;
       }
     }
   }
-  return distances;
+  return distance_to;
 }
 } // namespace
 

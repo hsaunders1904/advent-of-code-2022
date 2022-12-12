@@ -17,7 +17,7 @@ inline std::vector<std::string> read_line(std::istream *stream) {
 
 std::string to_string(str_vec_iterator begin, str_vec_iterator end) {
   std::string out = "/";
-  for (; begin != end; begin++) {
+  for (; begin != end; ++begin) {
     out += *begin + "/";
   }
   return out;
