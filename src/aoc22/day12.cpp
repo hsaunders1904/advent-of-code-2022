@@ -5,10 +5,10 @@
 #include <set>
 
 namespace {
-std::tuple<std::vector<std::vector<int>>, std::array<std::size_t, 2>,
+std::tuple<std::vector<std::vector<std::size_t>>, std::array<std::size_t, 2>,
            std::array<std::size_t, 2>>
 read_elevations(std::istream *input) {
-  std::vector<std::vector<int>> elevations;
+  std::vector<std::vector<std::size_t>> elevations;
   std::array<std::size_t, 2> start{0};
   std::array<std::size_t, 2> end{0};
 
@@ -31,7 +31,7 @@ read_elevations(std::istream *input) {
 }
 
 std::vector<std::set<std::size_t>>
-make_adjacency_list(const std::vector<std::vector<int>> &elevations) {
+make_adjacency_list(const std::vector<std::vector<std::size_t>> &elevations) {
   const std::size_t height = elevations.size();
   const std::size_t width = elevations[0].size();
   std::vector<std::set<std::size_t>> adjacency_list(width * height);
@@ -103,6 +103,14 @@ dijkstra(const std::vector<std::set<std::size_t>> &adjacency,
   }
   return dist;
 }
+
+void invert_elevations(std::vector<std::vector<std::size_t>> *elevations) {
+  for (auto &row : *elevations) {
+    for (auto &el : row) {
+      el = 'z' - 'a' - el;
+    }
+  }
+}
 } // namespace
 
 int day12_1(std::istream *input_file) {
@@ -113,4 +121,21 @@ int day12_1(std::istream *input_file) {
   return distances[end[0] * width + end[1]];
 }
 
-int day12_2(std::istream *input_file) { return 1; }
+int day12_2(std::istream *input_file) {
+  auto [elevations, start, end] = read_elevations(input_file);
+  invert_elevations(&elevations);
+  auto width = elevations[0].size();
+  const auto adjacency_list = make_adjacency_list(elevations);
+  const auto distances = dijkstra(adjacency_list, end[0] * width + end[1]);
+
+  auto min_dist = std::numeric_limits<std::size_t>().max();
+  for (auto row_idx = 0U; row_idx < elevations.size(); ++row_idx) {
+    for (auto col_idx = 0U; col_idx < width; ++col_idx) {
+      auto dist = distances[row_idx * width + col_idx];
+      if (elevations[row_idx][col_idx] == 25 && dist < min_dist) {
+        min_dist = dist;
+      }
+    }
+  }
+  return min_dist;
+}
