@@ -227,4 +227,9 @@ constexpr auto day11 = "Monkey 0:\n"
                        "  Test: divisible by 17\n"
                        "    If true: throw to monkey 0\n"
                        "    If false: throw to monkey 1\n";
+constexpr auto day12 = "Sabqponm\n"
+                       "abcryxxl\n"
+                       "accszExk\n"
+                       "acctuvwj\n"
+                       "abdefghi\n";
 } // namespace data

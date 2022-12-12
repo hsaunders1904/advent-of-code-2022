@@ -31,6 +31,8 @@ int day10_1(std::istream *input_file);
 std::string day10_2(std::istream *input_file);
 u_int64_t day11_1(std::istream *input_file);
 u_int64_t day11_2(std::istream *input_file);
+int day12_1(std::istream *input_file);
+int day12_2(std::istream *input_file);
 
 std::vector<std::string> split(const std::string &str, const char split_on);
 void ltrim(std::string *str);
