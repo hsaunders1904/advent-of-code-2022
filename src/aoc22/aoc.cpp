@@ -12,9 +12,9 @@ std::vector<std::string> split(const std::string &str, const char split_on) {
 }
 
 void ltrim(std::string *str) {
-  str->erase(str->begin(),
-             std::find_if(str->begin(), str->end(),
-                          [](unsigned char ch) { return std::isalnum(ch); }));
+  str->erase(str->begin(), std::find_if(str->begin(), str->end(), [](unsigned char ch) {
+               return std::isalnum(ch);
+             }));
 }
 
 void rtrim(std::string *str) {

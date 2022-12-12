@@ -57,8 +57,7 @@ int run_day(int argc, char *argv[], day_func<T> part_1, day_func<U> part_2) {
     auto start = std::chrono::steady_clock::now().time_since_epoch().count();
     auto p1 = part_1(&stream);
     auto end = std::chrono::steady_clock::now().time_since_epoch().count();
-    std::cout << p1 << " (in " << std::scientific << (end - start) * 1e-9
-              << " s)\n";
+    std::cout << p1 << " (in " << std::scientific << (end - start) * 1e-9 << " s)\n";
     if (args.part_2) {
       stream.clear();
       stream.seekg(0, std::ios::beg);
@@ -68,8 +67,7 @@ int run_day(int argc, char *argv[], day_func<T> part_1, day_func<U> part_2) {
     auto start = std::chrono::steady_clock::now().time_since_epoch().count();
     auto p2 = part_2(&stream);
     auto end = std::chrono::steady_clock::now().time_since_epoch().count();
-    std::cout << p2 << " (in " << std::scientific << (end - start) * 1e-9
-              << " s)\n";
+    std::cout << p2 << " (in " << std::scientific << (end - start) * 1e-9 << " s)\n";
   }
   return 0;
 }

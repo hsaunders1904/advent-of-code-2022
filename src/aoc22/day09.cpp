@@ -73,10 +73,6 @@ int count_tail_positions(std::istream *input_file, std::size_t num_knots) {
 }
 } // namespace
 
-int day09_1(std::istream *input_file) {
-  return count_tail_positions(input_file, 2);
-}
+int day09_1(std::istream *input_file) { return count_tail_positions(input_file, 2); }
 
-int day09_2(std::istream *input_file) {
-  return count_tail_positions(input_file, 10);
-}
+int day09_2(std::istream *input_file) { return count_tail_positions(input_file, 10); }

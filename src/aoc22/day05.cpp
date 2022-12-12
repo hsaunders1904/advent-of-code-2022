@@ -48,9 +48,8 @@ std::string day05_1(std::istream *input_file) {
       stacks[from].pop();
     }
   }
-  return std::accumulate(
-      stacks.begin(), stacks.end(), std::string{},
-      [](const auto &acc, const auto &st) { return acc + st.top(); });
+  return std::accumulate(stacks.begin(), stacks.end(), std::string{},
+                         [](const auto &acc, const auto &st) { return acc + st.top(); });
 }
 
 std::string day05_2(std::istream *input_file) {
@@ -66,7 +65,6 @@ std::string day05_2(std::istream *input_file) {
       stacks[to].push(el);
     }
   }
-  return std::accumulate(
-      stacks.begin(), stacks.end(), std::string{},
-      [](const auto &acc, const auto &st) { return acc + st.top(); });
+  return std::accumulate(stacks.begin(), stacks.end(), std::string{},
+                         [](const auto &acc, const auto &st) { return acc + st.top(); });
 }

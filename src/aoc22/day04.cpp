@@ -3,8 +3,7 @@
 #include <array>
 
 namespace {
-std::pair<std::string, std::string> split(const std::string &str,
-                                          const char split_str) {
+std::pair<std::string, std::string> split(const std::string &str, const char split_str) {
   auto split_pos = str.find(split_str);
   auto first = str.substr(0, split_pos);
   auto second = str.substr(split_pos + 1, str.size());

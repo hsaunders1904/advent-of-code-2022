@@ -4,8 +4,7 @@
 #include <numeric>
 
 namespace {
-std::tuple<std::vector<std::size_t>, std::size_t>
-read_matrix(std::istream *input) {
+std::tuple<std::vector<std::size_t>, std::size_t> read_matrix(std::istream *input) {
   std::vector<std::size_t> heights;
   std::size_t width{0};
   for (std::string line; std::getline(*input, line);) {
@@ -20,8 +19,8 @@ read_matrix(std::istream *input) {
   return {heights, width};
 }
 
-bool idx_visible(const std::vector<std::size_t> &mat, std::size_t row,
-                 std::size_t col, std::size_t width) {
+bool idx_visible(const std::vector<std::size_t> &mat, std::size_t row, std::size_t col,
+                 std::size_t width) {
   const auto el = mat[row * width + col];
 
   auto visible_left = true;

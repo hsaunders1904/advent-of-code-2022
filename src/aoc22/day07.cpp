@@ -7,9 +7,7 @@
 using str_vec_iterator = std::vector<std::string>::iterator;
 
 namespace {
-inline bool is_command(const std::vector<std::string> &line) {
-  return line[0] == "$";
-}
+inline bool is_command(const std::vector<std::string> &line) { return line[0] == "$"; }
 
 inline std::vector<std::string> read_line(std::istream *stream) {
   std::string line;
@@ -46,8 +44,8 @@ std::map<std::string, int> directory_sizes(std::istream *input_file) {
           if (line[0][0] != 'd') {
             const auto file_size = std::stoi(line[0]);
             for (auto i = 0U; i < current_dir.size() + 1; ++i) {
-              auto dir_name = to_string(current_dir.begin(),
-                                        std::next(current_dir.begin(), i));
+              auto dir_name =
+                  to_string(current_dir.begin(), std::next(current_dir.begin(), i));
               dir_sizes[dir_name] += file_size;
             }
           }
