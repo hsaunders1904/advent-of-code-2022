@@ -124,12 +124,13 @@ u_int64_t day11_1(std::istream *input_file) {
 
 u_int64_t day11_2(std::istream *input_file) {
   auto monkeys = read_monkeys(input_file);
+  // We must guard against 'worry level' integer overflows in this part.
+  // Use the fact that every divisor is a prime number. We can take the
+  // 'worry level' modulo the product of all the divisors, to get a smaller
+  // number that still has the same set of prime divisors.
   u_int64_t divisor_prod = std::accumulate(
       monkeys.begin(), monkeys.end(), 1U,
       [](const auto &acc, const auto &m) { return acc * m.divisor; });
-  // Use the fact that every divisor is a prime number. We can take the
-  // 'worry level' modulo the product of all the divisors, to get a smaller
-  // number that still has the same set of divisors.
   auto wl_manager = [divisor_prod](auto wl) { return wl % divisor_prod; };
   return simulate(monkeys, 10000, wl_manager);
 }
