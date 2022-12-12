@@ -1,7 +1,7 @@
 #include "aoc22/aoc.h"
 
 #include <array>
-#include <list>
+#include <queue>
 #include <set>
 
 namespace {
@@ -37,8 +37,7 @@ Landscape read_landscape(std::istream *input) {
 }
 
 std::vector<std::set<std::size_t>>
-make_adjacency_list(const std::vector<std::size_t> &elevations,
-                    std::size_t width) {
+make_adjacency_list(const std::vector<std::size_t> &elevations, std::size_t width) {
   std::vector<std::set<std::size_t>> adjacency_list(elevations.size());
   for (auto node_num = 0U; node_num < elevations.size(); ++node_num) {
     std::size_t i = node_num / width;
@@ -62,40 +61,37 @@ make_adjacency_list(const std::vector<std::size_t> &elevations,
 }
 
 std::vector<std::size_t>
-dijkstra(const std::vector<std::set<std::size_t>> &adjacency, std::size_t start,
-         std::optional<std::size_t> target = std::nullopt) {
-  std::vector<std::size_t> dist(adjacency.size(), INT_MAX);
-  dist[start] = 0;
-  std::list<std::size_t> unvisited;
-  for (auto v = 0U; v < adjacency.size(); ++v) {
-    unvisited.push_back(v);
-  }
+breadth_first_search(const std::vector<std::set<std::size_t>> &adjacency,
+                     std::size_t start,
+                     std::optional<std::size_t> target = std::nullopt) {
+  std::queue<std::size_t> queue;
+  queue.push(start);
+  std::vector<bool> explored(adjacency.size(), false);
+  explored[start] = true;
+  std::vector<std::size_t> distances(adjacency.size(), 0);
 
-  while (!unvisited.empty()) {
-    auto min_path_it = std::min_element(
-        unvisited.begin(), unvisited.end(),
-        [&dist](const auto m, const auto v) { return dist[m] < dist[v]; });
-    auto min_path = *min_path_it;
-    if (target && target.value() == min_path) {
-      return {dist[min_path]};
+  while (!queue.empty()) {
+    auto u = queue.front();
+    queue.pop();
+    if (target && u == target) {
+      return {distances[u]};
     }
-    unvisited.erase(min_path_it);
-
-    for (auto neighbour : adjacency[min_path]) {
-      auto alt = dist[min_path] + 1;
-      if (alt < dist[neighbour]) {
-        dist[neighbour] = alt;
+    for (auto neighbour : adjacency[u]) {
+      if (!explored[neighbour]) {
+        queue.push(neighbour);
+        explored[neighbour] = true;
+        distances[neighbour] = distances[u] + 1;
       }
     }
   }
-  return dist;
+  return distances;
 }
 } // namespace
 
 std::size_t day12_1(std::istream *input_file) {
   auto landscape = read_landscape(input_file);
   auto adj_list = make_adjacency_list(landscape.elevation, landscape.width);
-  auto distance = dijkstra(adj_list, landscape.start, landscape.end);
+  auto distance = breadth_first_search(adj_list, landscape.start, landscape.end);
   return distance.at(0);
 }
 
@@ -103,11 +99,11 @@ std::size_t day12_2(std::istream *input_file) {
   auto landscape = read_landscape(input_file);
   landscape.invert_elevations();
   auto adj_list = make_adjacency_list(landscape.elevation, landscape.width);
-  auto distances = dijkstra(adj_list, landscape.end);
+  auto distances = breadth_first_search(adj_list, landscape.end);
 
   auto min_dist = SIZE_T_MAX;
   for (auto i = 0U; i < landscape.elevation.size(); ++i) {
-    if (landscape.elevation[i] == 25) {
+    if (landscape.elevation[i] == 25 && distances[i] != 0) {
       min_dist = std::min(min_dist, distances[i]);
     }
   }
