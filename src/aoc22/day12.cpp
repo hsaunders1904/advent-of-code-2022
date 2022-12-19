@@ -36,10 +36,11 @@ Landscape read_landscape(std::istream *input) {
   return scape;
 }
 
-std::vector<std::set<std::size_t>>
+std::vector<std::vector<std::size_t>>
 make_adjacency_list(const std::vector<std::size_t> &elevations, std::size_t width) {
-  std::vector<std::set<std::size_t>> adjacency_list(elevations.size());
+  std::vector<std::vector<std::size_t>> adjacency_list(elevations.size());
   for (auto node_num = 0U; node_num < elevations.size(); ++node_num) {
+    adjacency_list[node_num].reserve(4);
     std::size_t i = node_num / width;
     std::size_t j = node_num % width;
     constexpr std::array<std::array<int, 2>, 4> offsets = {
@@ -49,11 +50,12 @@ make_adjacency_list(const std::vector<std::size_t> &elevations, std::size_t widt
       int neighbour_j = j + j_offset;
       auto neighbour_node_num = width * neighbour_i + neighbour_j;
       if (neighbour_i < 0 || neighbour_j < 0 ||
-          neighbour_node_num >= elevations.size()) {
+          static_cast<std::size_t>(neighbour_i) >= elevations.size() / width ||
+          static_cast<std::size_t>(neighbour_j) >= width) {
         continue;
       }
       if (elevations[neighbour_node_num] <= elevations[node_num] + 1) {
-        adjacency_list[node_num].insert(neighbour_node_num);
+        adjacency_list[node_num].emplace_back(neighbour_node_num);
       }
     }
   }
@@ -61,7 +63,7 @@ make_adjacency_list(const std::vector<std::size_t> &elevations, std::size_t widt
 }
 
 std::vector<std::size_t>
-breadth_first_search(const std::vector<std::set<std::size_t>> &adjacency,
+breadth_first_search(const std::vector<std::vector<std::size_t>> &adjacency,
                      std::size_t start,
                      std::optional<std::size_t> target = std::nullopt) {
   std::queue<std::size_t> queue;
