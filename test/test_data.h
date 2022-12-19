@@ -1,9 +1,8 @@
 #pragma once
 
 namespace data {
-constexpr auto day01 =
-    "1000\n\n2000\n3000\n\n4000\n\n5000\n6000\n\n7000\n8000\n9000\n\n"
-    "10000\n\n";
+constexpr auto day01 = "1000\n\n2000\n3000\n\n4000\n\n5000\n6000\n\n7000\n8000\n9000\n\n"
+                       "10000\n\n";
 constexpr auto day02 = "A Y\nB X\nC Z\n";
 constexpr auto day03 = "vJrwpWtwJgWrhcsFMMfFFhFp\n"
                        "jqHRNqRjqzjGDLGLrsFMfFZSrLrFZsSL\n"
@@ -232,4 +231,28 @@ constexpr auto day12 = "Sabqponm\n"
                        "accszExk\n"
                        "acctuvwj\n"
                        "abdefghi\n";
+
+constexpr auto day13 = "[1,1,3,1,1]\n"
+                       "[1,1,5,1,1]\n"
+                       "\n"
+                       "[[1],[2,3,4]]\n"
+                       "[[1],4]\n"
+                       "\n"
+                       "[9]\n"
+                       "[[8,7,6]]\n"
+                       "\n"
+                       "[[4,4],4,4]\n"
+                       "[[4,4],4,4,4]\n"
+                       "\n"
+                       "[7,7,7,7]\n"
+                       "[7,7,7]\n"
+                       "\n"
+                       "[]\n"
+                       "[3]\n"
+                       "\n"
+                       "[[[]]]\n"
+                       "[[]]\n"
+                       "\n"
+                       "[1,[2,[3,[4,[5,6,7]]]],8,9]\n"
+                       "[1,[2,[3,[4,[5,6,0]]]],8,9]\n";
 } // namespace data
