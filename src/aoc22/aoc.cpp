@@ -11,6 +11,18 @@ std::vector<std::string> split(const std::string &str, const char split_on) {
   return parts;
 }
 
+std::vector<std::string> split(const std::string &str, const std::string &split_on) {
+  std::vector<std::string> parts;
+  auto beg = str.begin();
+  auto split_pos = str.begin();
+  while (beg <= str.end()) {
+    split_pos = std::find_first_of(beg, str.end(), split_on.begin(), split_on.end());
+    parts.emplace_back(beg, split_pos);
+    beg = std::next(split_pos, split_on.size());
+  }
+  return parts;
+}
+
 void ltrim(std::string *str) {
   str->erase(str->begin(), std::find_if(str->begin(), str->end(), [](unsigned char ch) {
                return std::isalnum(ch);

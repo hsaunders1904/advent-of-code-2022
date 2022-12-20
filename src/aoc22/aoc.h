@@ -35,8 +35,11 @@ std::size_t day12_1(std::istream *input_file);
 std::size_t day12_2(std::istream *input_file);
 int day13_1(std::istream *input_file);
 int day13_2(std::istream *input_file);
+int day14_1(std::istream *input_file);
+int day14_2(std::istream *input_file);
 
 std::vector<std::string> split(const std::string &str, const char split_on);
+std::vector<std::string> split(const std::string &str, const std::string &split_on);
 void ltrim(std::string *str);
 void rtrim(std::string *str);
 void trim(std::string *str);
