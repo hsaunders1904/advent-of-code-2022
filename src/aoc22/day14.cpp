@@ -61,7 +61,7 @@ int day14_1(std::istream *input_file) {
   int depth{0};
   int max_depth = waterfall.rbegin()->first;
   int col{0};
-  std::size_t fixed_sand{0};
+  int fixed_sand{0};
   while (true) {
     if (is_filled(waterfall, depth + 1, col)) {
       if (is_filled(waterfall, depth + 1, col - 1)) {
@@ -94,7 +94,7 @@ int day14_2(std::istream *input_file) {
   int depth{0};
   int max_depth = waterfall.rbegin()->first + 2;
   int col{0};
-  std::size_t fixed_sand{0};
+  int fixed_sand{0};
   while (true) {
     if (depth + 1 >= max_depth) {
       waterfall[depth].insert(col);
