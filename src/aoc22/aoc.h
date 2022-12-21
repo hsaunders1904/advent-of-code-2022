@@ -8,6 +8,7 @@
 #include <vector>
 
 template <typename T> using day_func = std::function<T(std::istream *)>;
+using std::chrono::high_resolution_clock;
 
 int day01_1(std::istream *input_file);
 int day01_2(std::istream *input_file);
@@ -59,9 +60,9 @@ int run_day(int argc, char *argv[], day_func<T> part_1, day_func<U> part_2) {
   auto args = details::parse_args(argc, argv);
   auto stream = details::open_file(args.data_file);
   if (args.part_1) {
-    auto start = std::chrono::steady_clock::now().time_since_epoch().count();
+    auto start = high_resolution_clock::now().time_since_epoch().count();
     auto p1 = part_1(&stream);
-    auto end = std::chrono::steady_clock::now().time_since_epoch().count();
+    auto end = high_resolution_clock::now().time_since_epoch().count();
     std::cout << p1 << " (in " << std::scientific << (end - start) * 1e-9 << " s)\n";
     if (args.part_2) {
       stream.clear();
@@ -69,9 +70,9 @@ int run_day(int argc, char *argv[], day_func<T> part_1, day_func<U> part_2) {
     }
   }
   if (args.part_2) {
-    auto start = std::chrono::steady_clock::now().time_since_epoch().count();
+    auto start = high_resolution_clock::now().time_since_epoch().count();
     auto p2 = part_2(&stream);
-    auto end = std::chrono::steady_clock::now().time_since_epoch().count();
+    auto end = high_resolution_clock::now().time_since_epoch().count();
     std::cout << p2 << " (in " << std::scientific << (end - start) * 1e-9 << " s)\n";
   }
   return 0;
