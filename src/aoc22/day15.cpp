@@ -8,6 +8,7 @@
 namespace {
 constexpr auto DATA_LINE_PATTERN =
     ".* x=(-?[0-9]+), y=(-?[0-9]+): .* x=(-?[0-9]+), y=(-?[0-9]+)$";
+constexpr std::size_t TUNING_FACTOR{4'000'000};
 
 struct PosHash;
 
@@ -16,6 +17,8 @@ using PosMap = std::unordered_map<Pos, Pos, PosHash>;
 
 struct PosHash {
   std::size_t operator()(const Pos &pos) const {
+    // No need for a proper hash here. Just use the first 32 bits to store x, and the
+    // final 32 to store y.
     constexpr uint64_t size_of_int{32};
     return static_cast<uint64_t>(static_cast<uint>(pos[0])) << size_of_int |
            static_cast<uint>(pos[1]);
@@ -48,6 +51,48 @@ std::unordered_set<int> beacons_in_row(const PosMap &positions, const int row) {
   }
   return x_positions;
 }
+
+struct Region {
+  std::array<int, 2> x_lims;
+  std::array<int, 2> y_lims;
+  std::array<Pos, 4> corners() const {
+    Pos c1({x_lims[0], y_lims[0]});
+    Pos c2({x_lims[0], y_lims[1]});
+    Pos c3({x_lims[1], y_lims[0]});
+    Pos c4({x_lims[1], y_lims[1]});
+    return {c1, c2, c3, c4};
+  }
+  bool size_is_1() const { return x_lims[0] == x_lims[1] && y_lims[0] == y_lims[1]; }
+};
+
+std::array<Region, 4> quarter(const Region &region) {
+  auto min_x = region.x_lims[0];
+  auto max_x = region.x_lims[1];
+  auto min_y = region.y_lims[0];
+  auto max_y = region.y_lims[1];
+  auto mid_x = (max_x + min_x) / 2;
+  auto mid_y = (max_y + min_y) / 2;
+
+  Region lower_left({{min_x, mid_x}, {min_y, mid_y}});
+  Region upper_left({{min_x, mid_x}, {std::min(mid_y + 1, max_y), max_y}});
+  Region lower_right({{std::min(mid_x + 1, max_x), max_x}, {min_y, mid_y}});
+  Region upper_right(
+      {{std::min(mid_x + 1, max_x), max_x}, {std::min(mid_y + 1, max_y), max_y}});
+  return {lower_left, upper_left, lower_right, upper_right};
+}
+
+bool contains_uncovered(const Region &region, const std::pair<Pos, Pos> &sensor_beacon) {
+  // If the distance to each corner is less than the sensor's radius, then there are no
+  // uncovered points in the region. Note, we use the converse here; if the max corner
+  // distance is greater than the radius, there are some uncovered points in the region.
+  auto max_dist = 0;
+  for (const auto &corner : region.corners()) {
+    auto dist_to_corner = manhattan_dist(corner, sensor_beacon.first);
+    max_dist = std::max(dist_to_corner, max_dist);
+  }
+  const auto radius = manhattan_dist(sensor_beacon.first, sensor_beacon.second);
+  return max_dist > radius;
+}
 } // namespace
 
 int day15_1(std::istream *input_file, const int row_to_check) {
@@ -73,4 +118,27 @@ int day15_1(std::istream *input_file, const int row_to_check) {
   return row_forbidden.size();
 }
 
-int day15_2(std::istream *input_file) { return 1; }
+std::size_t day15_2(std::istream *input_file, const int max_coord) {
+  const auto positions = read_positions(input_file);
+  // Break the region into quadrants, check if the beacon can exist in each quadrant,
+  // then, if it can, break that quadrant down. Repeat until left with a quadrant
+  // consisting of a single point.
+  Region full_region({{0, max_coord}, {0, max_coord}});
+  std::vector<Region> regions = {full_region};
+  while (regions.size() > 0) {
+    auto region = regions[regions.size() - 1];
+    regions.pop_back();
+    if (region.size_is_1()) {
+      return static_cast<std::size_t>(region.x_lims[0]) * TUNING_FACTOR +
+             static_cast<std::size_t>(region.y_lims[0]);
+    }
+    for (const auto &quadrant : quarter(region)) {
+      if (std::all_of(positions.begin(), positions.end(), [&quadrant](const auto &sb) {
+            return contains_uncovered(quadrant, sb);
+          })) {
+        regions.emplace_back(quadrant);
+      }
+    }
+  }
+  return 0;
+}
