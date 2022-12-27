@@ -14,6 +14,7 @@ set(DAYS
   13
   14
   15
+  16
 )
 foreach(day ${DAYS})
   list(APPEND SRC "day${day}.cpp")
@@ -21,5 +22,5 @@ foreach(day ${DAYS})
   target_link_libraries("day${day}" PRIVATE aoc)
 endforeach()
 
-add_library(aoc SHARED ${SRC} "aoc.cpp" "aoc.h")
+add_library(aoc SHARED ${SRC} "utils.cpp" "aoc.h")
 set_target_properties(aoc PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS ON)

@@ -1,6 +1,8 @@
-#include "aoc22/aoc.h"
+#include "aoc22/utils.h"
 
 #include <argparse/argparse.hpp>
+
+#include <sstream>
 
 std::vector<std::string> split(const std::string &str, const char split_on) {
   std::vector<std::string> parts;
