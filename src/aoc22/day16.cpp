@@ -4,6 +4,7 @@
 #include <numeric>
 #include <queue>
 #include <set>
+#include <unordered_set>
 
 namespace {
 std::pair<std::vector<std::size_t>, std::vector<std::vector<std::size_t>>>
@@ -41,6 +42,17 @@ read_valves(std::istream *input) {
   return {flow_rate, adj_list};
 }
 
+// https://stackoverflow.com/questions/42701688/using-an-unordered-map-with-arrays-as-keys
+template <std::size_t N> struct ArrayHasher {
+  std::size_t operator()(const std::array<std::size_t, N> &arr) const {
+    std::size_t h{0};
+    for (auto e : arr) {
+      h ^= std::hash<int>{}(e) + 0x9e3779b9 + (h << 6) + (h >> 2);
+    }
+    return h;
+  }
+};
+
 Vec2d<std::size_t>
 floyd_warshall(const std::vector<std::vector<std::size_t>> &adj_list) {
   Vec2d<std::size_t> dist(adj_list.size(), adj_list.size(),
@@ -62,7 +74,7 @@ floyd_warshall(const std::vector<std::vector<std::size_t>> &adj_list) {
 }
 
 std::size_t to_bit_array(const std::vector<bool> &vec) {
-  std::size_t bit_array;
+  std::size_t bit_array{0};
   for (auto b : vec) {
     bit_array += b;
     bit_array = bit_array << 1;
@@ -79,17 +91,6 @@ struct State {
     return {to_bit_array(opened), position, time_spent, pressure_relieved};
   }
 };
-
-template <typename T, typename U>
-std::vector<std::size_t> idxs_where(const T &container, const U unary_condition) {
-  std::vector<std::size_t> idxs;
-  for (auto i = 0U; i < container.size(); ++i) {
-    if (unary_condition(container[i])) {
-      idxs.emplace_back(i);
-    }
-  }
-  return idxs;
-}
 
 std::size_t sum_flow_rate(const State &state, const std::vector<std::size_t> flow_rate) {
   std::size_t flow_rate_sum{0};
@@ -141,7 +142,7 @@ int day16_1(std::istream *input_file) {
   State initial_state({opened, 0, 0, 0});
   std::queue<State> states;
   states.push(initial_state);
-  std::set<std::array<std::size_t, 4>> visited_states;
+  std::unordered_set<std::array<std::size_t, 4>, ArrayHasher<4>> visited_states;
   visited_states.insert(initial_state.to_array());
   while (states.size() > 0) {
     auto state = states.front();
