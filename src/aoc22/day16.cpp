@@ -3,10 +3,11 @@
 #include <map>
 #include <numeric>
 #include <queue>
-#include <set>
 #include <unordered_set>
 
 namespace {
+using ul_bitset = std::bitset<sizeof(std::size_t)>;
+
 std::pair<std::vector<std::size_t>, std::vector<std::vector<std::size_t>>>
 read_valves(std::istream *input) {
   std::map<std::string, std::size_t> flow_rates;
@@ -52,6 +53,7 @@ template <std::size_t N> struct ArrayHasher {
     return h;
   }
 };
+using StateSet = std::unordered_set<std::array<std::size_t, 4>, ArrayHasher<4>>;
 
 Vec2d<std::size_t>
 floyd_warshall(const std::vector<std::vector<std::size_t>> &adj_list) {
@@ -73,22 +75,13 @@ floyd_warshall(const std::vector<std::vector<std::size_t>> &adj_list) {
   return dist;
 }
 
-std::size_t to_bit_array(const std::vector<bool> &vec) {
-  std::size_t bit_array{0};
-  for (auto b : vec) {
-    bit_array += b;
-    bit_array = bit_array << 1;
-  }
-  return bit_array;
-}
-
 struct State {
-  std::vector<bool> opened;
+  ul_bitset opened;
   std::size_t position;
   std::size_t time_spent;
   std::size_t pressure_relieved;
   std::array<std::size_t, 4> to_array() const {
-    return {to_bit_array(opened), position, time_spent, pressure_relieved};
+    return {opened.to_ulong(), position, time_spent, pressure_relieved};
   }
 };
 
@@ -110,7 +103,7 @@ std::size_t sim_to_end(const State &state, const std::vector<std::size_t> flow_r
 }
 
 std::vector<std::size_t> unopened_flowing(const std::vector<std::size_t> &flow_rate,
-                                          const std::vector<bool> &opened) {
+                                          const ul_bitset opened) {
   std::vector<std::size_t> uof;
   for (auto i = 0U; i < flow_rate.size(); ++i) {
     if (flow_rate[i] > 0 && !opened[i]) {
@@ -120,8 +113,7 @@ std::vector<std::size_t> unopened_flowing(const std::vector<std::size_t> &flow_r
   return uof;
 }
 
-bool all_valves_open(const std::vector<std::size_t> &flow_rate,
-                     const std::vector<bool> &opened) {
+bool all_valves_open(const std::vector<std::size_t> &flow_rate, const ul_bitset opened) {
   for (auto i = 0U; i < flow_rate.size(); ++i) {
     if (flow_rate[i] > 0 && !opened[i]) {
       return false;
@@ -134,21 +126,18 @@ bool all_valves_open(const std::vector<std::size_t> &flow_rate,
 int day16_1(std::istream *input_file) {
   const auto [flow_rate, adjacency_list] = read_valves(input_file);
   const auto distance = floyd_warshall(adjacency_list);
-
   const std::size_t time_budget{30};
-  std::size_t max_pressure_relieved{0};
-  std::vector<bool> opened(flow_rate.size(), false);
 
-  State initial_state({opened, 0, 0, 0});
+  State initial_state({0, 0, 0, 0});
   std::queue<State> states;
   states.push(initial_state);
-  std::unordered_set<std::array<std::size_t, 4>, ArrayHasher<4>> visited_states;
-  visited_states.insert(initial_state.to_array());
+  StateSet visited_states{initial_state.to_array()};
+  std::size_t max_pressure_relieved{0};
   while (states.size() > 0) {
     auto state = states.front();
     states.pop();
 
-    if (all_valves_open(flow_rate, state.opened) || state.time_spent >= time_budget) {
+    if (all_valves_open(flow_rate, state.opened)) {
       auto relieved = sim_to_end(state, flow_rate, time_budget);
       max_pressure_relieved = std::max(relieved, max_pressure_relieved);
       continue;
