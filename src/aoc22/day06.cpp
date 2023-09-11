@@ -3,7 +3,8 @@
 #include <set>
 
 namespace {
-int find_distinct_char_idx(const std::string &signal, std::size_t window_size) {
+int find_distinct_char_idx(const std::string &signal,
+                           const std::size_t window_size) {
   auto window_beg = signal.begin();
   auto window_end = std::next(window_beg, window_size);
   for (auto i = 0U; i < signal.size() - window_size; ++i) {

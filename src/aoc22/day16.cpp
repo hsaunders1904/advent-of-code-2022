@@ -1,5 +1,6 @@
 #include "aoc22/aoc.h"
 
+#include <bitset>
 #include <map>
 #include <numeric>
 #include <queue>
@@ -16,9 +17,9 @@ read_valves(std::istream *input) {
     auto parts = split(line, ' ');
     auto valve_name = parts[1];
     auto flow_rate_str = split(parts[4], '=')[1];
-    flow_rate_str.erase(flow_rate_str.end()); // remove semicolon
-    std::string leads_to_str =
-        std::accumulate(std::next(parts.begin(), 9), parts.end(), std::string());
+    flow_rate_str.pop_back(); // remove semicolon
+    std::string leads_to_str = std::accumulate(std::next(parts.begin(), 9),
+                                               parts.end(), std::string());
     flow_rates[valve_name] = std::stoul(flow_rate_str);
     leads_to[valve_name] = split(leads_to_str, ',');
   }
@@ -68,7 +69,8 @@ floyd_warshall(const std::vector<std::vector<std::size_t>> &adj_list) {
   for (auto k = 0U; k < adj_list.size(); ++k) {
     for (auto i = 0U; i < adj_list.size(); ++i) {
       for (auto j = 0U; j < adj_list.size(); ++j) {
-        dist.get(i, j) = std::min(dist.get(i, j), dist.get(i, k) + dist.get(k, j));
+        dist.get(i, j) =
+            std::min(dist.get(i, j), dist.get(i, k) + dist.get(k, j));
       }
     }
   }
@@ -85,7 +87,8 @@ struct State {
   }
 };
 
-std::size_t sum_flow_rate(const State &state, const std::vector<std::size_t> flow_rate) {
+std::size_t sum_flow_rate(const State &state,
+                          const std::vector<std::size_t> flow_rate) {
   std::size_t flow_rate_sum{0};
   for (auto i = 0U; i < flow_rate.size(); ++i) {
     if (state.opened[i]) {
@@ -95,15 +98,17 @@ std::size_t sum_flow_rate(const State &state, const std::vector<std::size_t> flo
   return flow_rate_sum;
 }
 
-std::size_t sim_to_end(const State &state, const std::vector<std::size_t> flow_rate,
+std::size_t sim_to_end(const State &state,
+                       const std::vector<std::size_t> &flow_rate,
                        const std::size_t time_budget) {
   auto relieved_per_min = sum_flow_rate(state, flow_rate);
   auto time_remaining = time_budget - state.time_spent;
   return state.pressure_relieved + relieved_per_min * time_remaining;
 }
 
-std::vector<std::size_t> unopened_flowing(const std::vector<std::size_t> &flow_rate,
-                                          const ul_bitset opened) {
+std::vector<std::size_t>
+unopened_flowing(const std::vector<std::size_t> &flow_rate,
+                 const ul_bitset opened) {
   std::vector<std::size_t> uof;
   for (auto i = 0U; i < flow_rate.size(); ++i) {
     if (flow_rate[i] > 0 && !opened[i]) {
@@ -113,13 +118,24 @@ std::vector<std::size_t> unopened_flowing(const std::vector<std::size_t> &flow_r
   return uof;
 }
 
-bool all_valves_open(const std::vector<std::size_t> &flow_rate, const ul_bitset opened) {
+bool all_valves_open(const std::vector<std::size_t> &flow_rate,
+                     const ul_bitset opened) {
   for (auto i = 0U; i < flow_rate.size(); ++i) {
     if (flow_rate[i] > 0 && !opened[i]) {
       return false;
     }
   }
   return true;
+}
+
+State update_state(const State &state, bool opened, std::size_t position,
+                   std::size_t pressure_relieved, std::size_t cost) {
+  auto new_state = state;
+  new_state.opened[position] = opened;
+  new_state.position = position;
+  new_state.pressure_relieved += pressure_relieved;
+  new_state.time_spent += cost;
+  return new_state;
 }
 } // namespace
 
@@ -147,16 +163,13 @@ int day16_1(std::istream *input_file) {
       const auto cost = distance.at(state.position, dest) + 1;
       const auto time_spent = state.time_spent + cost;
       if (time_spent > time_budget) {
-        auto relieved = sim_to_end(state, flow_rate, time_budget);
+        const auto relieved = sim_to_end(state, flow_rate, time_budget);
         max_pressure_relieved = std::max(relieved, max_pressure_relieved);
         continue;
       }
       // Build the new state of things
-      auto new_state = state;
-      new_state.opened[dest] = true;
-      new_state.position = dest;
-      new_state.pressure_relieved += sum_flow_rate(state, flow_rate) * cost;
-      new_state.time_spent += cost;
+      const auto new_state = update_state(
+          state, true, dest, sum_flow_rate(state, flow_rate) * cost, cost);
 
       if (visited_states.find(new_state.to_array()) == visited_states.end()) {
         visited_states.insert(state.to_array());

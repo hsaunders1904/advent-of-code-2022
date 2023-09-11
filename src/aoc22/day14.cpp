@@ -1,8 +1,8 @@
 #include "aoc22/aoc.h"
 
 #include <array>
+#include <set>
 #include <unordered_map>
-#include <unordered_set>
 
 namespace {
 std::vector<int> range(int a, int b) {
@@ -25,8 +25,8 @@ std::array<int, 2> to_point(const std::string &str) {
   return {std::stoi(parts[0]) - 500, std::stoi(parts[1])};
 }
 
-std::unordered_map<int, std::unordered_set<int>> map_rocks(std::istream *input) {
-  std::unordered_map<int, std::unordered_set<int>> rocks;
+std::unordered_map<int, std::set<int>> map_rocks(std::istream *input) {
+  std::unordered_map<int, std::set<int>> rocks;
   for (std::string line; std::getline(*input, line);) {
     auto turning_points = split(line, " -> ");
     auto point_from = to_point(turning_points[0]);
@@ -49,15 +49,16 @@ std::unordered_map<int, std::unordered_set<int>> map_rocks(std::istream *input) 
   return rocks;
 }
 
-bool is_filled(const std::unordered_map<int, std::unordered_set<int>> &waterfall,
-               int depth, int col) {
+bool is_filled(const std::unordered_map<int, std::set<int>> &waterfall,
+               const int depth, const int col) {
   return waterfall.find(depth) != waterfall.end() &&
          waterfall.at(depth).find(col) != waterfall.at(depth).end();
 }
 
 template <typename T> int max_key(const std::unordered_map<int, T> &map) {
-  return std::max_element(map.begin(), map.end(),
-                          [](const auto &a, const auto &b) { return a.first < b.first; })
+  return std::max_element(
+             map.begin(), map.end(),
+             [](const auto &a, const auto &b) { return a.first < b.first; })
       ->first;
 }
 

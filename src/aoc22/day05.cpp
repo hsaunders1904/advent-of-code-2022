@@ -8,7 +8,7 @@ namespace {
 void fill_row(std::vector<std::vector<char>> *stacks, const std::string &line) {
   for (auto i = 0U; i < stacks->size(); ++i) {
     if (line[1 + i * 4] != ' ') {
-      (*stacks)[i].emplace_back(line[1 + i * 4]);
+      stacks->at(i).emplace_back(line[1 + i * 4]);
     }
   }
 }

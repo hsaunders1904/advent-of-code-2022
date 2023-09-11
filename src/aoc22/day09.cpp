@@ -14,16 +14,16 @@ std::pair<char, int> parse_instruction(const std::string &line) {
 void update_head(std::array<int, 2> *pos, const char direction) {
   switch (direction) {
   case 'R':
-    (*pos)[0] += 1;
+    pos->at(0) += 1;
     break;
   case 'L':
-    (*pos)[0] -= 1;
+    pos->at(0) -= 1;
     break;
   case 'U':
-    (*pos)[1] += 1;
+    pos->at(1) += 1;
     break;
   case 'D':
-    (*pos)[1] -= 1;
+    pos->at(1) -= 1;
     break;
   default:
     throw std::runtime_error("Invalid direction");
@@ -39,8 +39,8 @@ inline uint64_t encode_pos(const std::array<int, 2> &pos) {
 }
 
 void update_tail(std::array<int, 2> *tail, const std::array<int, 2> &head) {
-  auto dx = head[0] - (*tail)[0];
-  auto dy = head[1] - (*tail)[1];
+  auto dx = head[0] - tail->at(0);
+  auto dy = head[1] - tail->at(1);
   if (dx > 0) {
     dx--;
   } else if (dx < 0) {
@@ -56,7 +56,8 @@ void update_tail(std::array<int, 2> *tail, const std::array<int, 2> &head) {
   }
 }
 
-int count_tail_positions(std::istream *input_file, std::size_t num_knots) {
+int count_tail_positions(std::istream *input_file,
+                         const std::size_t num_knots) {
   std::vector<std::array<int, 2>> knots(num_knots);
   std::unordered_set<uint64_t> t_positions({encode_pos({0, 0})});
   for (std::string line; std::getline(*input_file, line);) {
@@ -73,6 +74,10 @@ int count_tail_positions(std::istream *input_file, std::size_t num_knots) {
 }
 } // namespace
 
-int day09_1(std::istream *input_file) { return count_tail_positions(input_file, 2); }
+int day09_1(std::istream *input_file) {
+  return count_tail_positions(input_file, 2);
+}
 
-int day09_2(std::istream *input_file) { return count_tail_positions(input_file, 10); }
+int day09_2(std::istream *input_file) {
+  return count_tail_positions(input_file, 10);
+}

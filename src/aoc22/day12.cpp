@@ -1,6 +1,7 @@
 #include "aoc22/aoc.h"
 
 #include <array>
+#include <optional>
 #include <queue>
 #include <set>
 
@@ -37,7 +38,8 @@ Landscape read_landscape(std::istream *input) {
 }
 
 std::vector<std::vector<std::size_t>>
-make_adjacency_list(const std::vector<std::size_t> &elevations, std::size_t width) {
+make_adjacency_list(const std::vector<std::size_t> &elevations,
+                    const std::size_t width) {
   std::vector<std::vector<std::size_t>> adjacency_list(elevations.size());
   for (auto node_num = 0U; node_num < elevations.size(); ++node_num) {
     adjacency_list[node_num].reserve(4);
@@ -64,8 +66,8 @@ make_adjacency_list(const std::vector<std::size_t> &elevations, std::size_t widt
 
 std::vector<std::size_t>
 breadth_first_search(const std::vector<std::vector<std::size_t>> &adjacency,
-                     std::size_t start,
-                     std::optional<std::size_t> target = std::nullopt) {
+                     const std::size_t start,
+                     const std::optional<std::size_t> &target = std::nullopt) {
   std::queue<std::size_t> queue;
   queue.push(start);
   std::vector<bool> explored(adjacency.size(), false);
@@ -93,7 +95,8 @@ breadth_first_search(const std::vector<std::vector<std::size_t>> &adjacency,
 std::size_t day12_1(std::istream *input_file) {
   auto landscape = read_landscape(input_file);
   auto adj_list = make_adjacency_list(landscape.elevation, landscape.width);
-  auto distance = breadth_first_search(adj_list, landscape.start, landscape.end);
+  auto distance =
+      breadth_first_search(adj_list, landscape.start, landscape.end);
   return distance.at(0);
 }
 
@@ -103,7 +106,8 @@ std::size_t day12_2(std::istream *input_file) {
   auto adj_list = make_adjacency_list(landscape.elevation, landscape.width);
   auto distances = breadth_first_search(adj_list, landscape.end);
 
-  auto min_dist = SIZE_T_MAX;
+  auto min_dist = std::numeric_limits<std::size_t>::max();
+  ;
   for (auto i = 0U; i < landscape.elevation.size(); ++i) {
     if (landscape.elevation[i] == 25 && distances[i] != 0) {
       min_dist = std::min(min_dist, distances[i]);

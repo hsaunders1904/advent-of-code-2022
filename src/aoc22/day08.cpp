@@ -4,7 +4,8 @@
 #include <numeric>
 
 namespace {
-std::tuple<std::vector<std::size_t>, std::size_t> read_matrix(std::istream *input) {
+std::tuple<std::vector<std::size_t>, std::size_t>
+read_matrix(std::istream *input) {
   std::vector<std::size_t> heights;
   std::size_t width{0};
   for (std::string line; std::getline(*input, line);) {
@@ -18,8 +19,8 @@ std::tuple<std::vector<std::size_t>, std::size_t> read_matrix(std::istream *inpu
   return {heights, width};
 }
 
-bool idx_visible(const std::vector<std::size_t> &mat, std::size_t row, std::size_t col,
-                 std::size_t width) {
+bool idx_visible(const std::vector<std::size_t> &mat, const std::size_t row,
+                 const std::size_t col, const std::size_t width) {
   const auto el = mat[row * width + col];
 
   auto visible_left = true;
@@ -72,8 +73,8 @@ bool idx_visible(const std::vector<std::size_t> &mat, std::size_t row, std::size
   return false;
 }
 
-int idx_scenic_score(const std::vector<std::size_t> &mat, std::size_t row,
-                     std::size_t col, std::size_t width) {
+int idx_scenic_score(const std::vector<std::size_t> &mat, const std::size_t row,
+                     const std::size_t col, const std::size_t width) {
   auto el = mat[row * width + col];
   std::array<int, 4> scores{0};
 

@@ -12,13 +12,14 @@ std::pair<std::string, int> parse_instruction(const std::string &line) {
   return {"", 0};
 }
 
-void update_signal(int *signal, int cycle_num, int x_reg) {
+void update_signal(int *signal, const int cycle_num, const int x_reg) {
   if ((cycle_num + 20) % DISPLAY_WIDTH == 0) {
     *signal += x_reg * cycle_num;
   }
 }
 
-void update_display(std::string *display, int cycle_num, int x_reg) {
+void update_display(std::string *display, const int cycle_num,
+                    const int x_reg) {
   auto pixel_pos = (cycle_num - 1) % DISPLAY_WIDTH;
   if (pixel_pos == 0 && cycle_num != 1) {
     *display += "\n";
