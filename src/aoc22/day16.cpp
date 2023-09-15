@@ -4,13 +4,12 @@
 #include <map>
 #include <numeric>
 #include <queue>
-#include <unordered_set>
+#include <unordered_map>
 
 namespace {
-using ul_bitset = std::bitset<sizeof(std::size_t)>;
-
 std::pair<std::vector<std::size_t>, std::vector<std::vector<std::size_t>>>
 read_valves(std::istream *input) {
+  // Important that we use an ordered map here, so AA is always first
   std::map<std::string, std::size_t> flow_rates;
   std::map<std::string, std::vector<std::string>> leads_to;
   for (std::string line; std::getline(*input, line);) {
@@ -65,31 +64,31 @@ floyd_warshall(const std::vector<std::vector<std::size_t>> &adj_list) {
 }
 
 struct State {
-  ul_bitset opened;
   std::size_t position;
-  std::size_t time_spent;
+  std::size_t time_remaining;
   std::size_t pressure_relieved;
+  std::bitset<64> opened;
+
   bool operator==(const State &other) const {
     return (opened == other.opened) && (position == other.position) &&
-           (time_spent == other.time_spent) &&
+           (time_remaining == other.time_remaining) &&
            (pressure_relieved == other.pressure_relieved);
   }
-};
 
-// https://stackoverflow.com/questions/42701688/using-an-unordered-map-with-arrays-as-keys
-struct StateHasher {
-  std::size_t operator()(const State &state) const {
-    std::size_t h{0};
-    for (auto e : {state.opened.to_ulong(), state.position, state.time_spent,
-                   state.pressure_relieved}) {
-      h ^= std::hash<int>{}(e) + 0x9e3779b9 + (h << 6) + (h >> 2);
-    }
-    return h;
+  State open_valve(std::size_t valve, std::size_t cost,
+                   std::size_t total_flow_rate) const {
+    auto new_state = *this;
+    new_state.position = valve;
+    new_state.opened.set(valve);
+    cost += 1; // time to open the valve
+    new_state.pressure_relieved = pressure_relieved + cost * total_flow_rate;
+    new_state.time_remaining = time_remaining < cost ? 0 : time_remaining - cost;
+    return new_state;
   }
 };
-using StateSet = std::unordered_set<State, StateHasher>;
 
-std::size_t sum_flow_rate(const State &state, const std::vector<std::size_t> flow_rate) {
+std::size_t sum_flow_rate(const State &state,
+                          const std::vector<std::size_t> &flow_rate) {
   std::size_t flow_rate_sum{0};
   for (auto i = 0U; i < flow_rate.size(); ++i) {
     if (state.opened[i]) {
@@ -99,16 +98,15 @@ std::size_t sum_flow_rate(const State &state, const std::vector<std::size_t> flo
   return flow_rate_sum;
 }
 
-std::size_t sim_to_end(const State &state, const std::vector<std::size_t> &flow_rate,
-                       const std::size_t time_budget) {
+std::size_t sim_to_end(const State &state, const std::vector<std::size_t> &flow_rate) {
   auto relieved_per_min = sum_flow_rate(state, flow_rate);
-  auto time_remaining = time_budget - state.time_spent;
-  return state.pressure_relieved + relieved_per_min * time_remaining;
+  return state.pressure_relieved + relieved_per_min * state.time_remaining;
 }
 
 std::vector<std::size_t> unopened_flowing(const std::vector<std::size_t> &flow_rate,
-                                          const ul_bitset opened) {
+                                          const std::bitset<64> opened) {
   std::vector<std::size_t> uof;
+  uof.reserve(flow_rate.size());
   for (auto i = 0U; i < flow_rate.size(); ++i) {
     if (flow_rate[i] > 0 && !opened[i]) {
       uof.emplace_back(i);
@@ -117,65 +115,72 @@ std::vector<std::size_t> unopened_flowing(const std::vector<std::size_t> &flow_r
   return uof;
 }
 
-bool all_valves_open(const std::vector<std::size_t> &flow_rate, const ul_bitset opened) {
+std::bitset<64> make_flowing_valve_bitmask(const std::vector<std::size_t> &flow_rate) {
+  std::bitset<64> all_valves_open_bitmask{0};
   for (auto i = 0U; i < flow_rate.size(); ++i) {
-    if (flow_rate[i] > 0 && !opened[i]) {
-      return false;
+    if (flow_rate[i] > 0) {
+      all_valves_open_bitmask.set(i);
     }
   }
-  return true;
+  return all_valves_open_bitmask;
 }
 
-State update_state(const State &state, bool opened, std::size_t position,
-                   std::size_t pressure_relieved, std::size_t cost) {
-  auto new_state = state;
-  new_state.opened[position] = opened;
-  new_state.position = position;
-  new_state.pressure_relieved += pressure_relieved;
-  new_state.time_spent += cost;
-  return new_state;
+std::unordered_map<std::bitset<64>, std::size_t>
+bfs_on_states(std::istream *input_file, const std::size_t time_budget) {
+  const auto [flow_rate, adjacency_list] = read_valves(input_file);
+  const auto distance = floyd_warshall(adjacency_list);
+  const std::bitset<64> all_valves_open_bitmask = make_flowing_valve_bitmask(flow_rate);
+
+  std::queue<State> state_queue;
+  state_queue.push({0, time_budget, 0, 0});
+  std::unordered_map<std::bitset<64>, std::size_t> state_to_max_relief;
+  while (state_queue.size() > 0) {
+    const auto state = state_queue.front();
+    state_queue.pop();
+
+    for (auto other_valve : unopened_flowing(flow_rate, state.opened)) {
+      if (other_valve == state.position) {
+        continue;
+      }
+
+      auto time_cost = distance.at(state.position, other_valve);
+      if (time_cost + 1 >= state.time_remaining) {
+        // + 1 & >= here, as for the journey to be useful, we need time to open the valve
+        // and for some pressure to be released.
+        continue;
+      }
+
+      auto current_flow_rate = sum_flow_rate(state, flow_rate);
+      auto new_state = state.open_valve(other_valve, time_cost, current_flow_rate);
+      if (new_state.opened != all_valves_open_bitmask) {
+        state_queue.push(new_state);
+      }
+      auto relief = sim_to_end(new_state, flow_rate);
+      state_to_max_relief[new_state.opened] =
+          std::max(relief, state_to_max_relief[new_state.opened]);
+    }
+  }
+  return state_to_max_relief;
 }
+
 } // namespace
 
 int day16_1(std::istream *input_file) {
-  const auto [flow_rate, adjacency_list] = read_valves(input_file);
-  const auto distance = floyd_warshall(adjacency_list);
-  const std::size_t time_budget{30};
+  const auto states = bfs_on_states(input_file, 30);
+  auto max_relief = std::max_element(states.begin(), states.end(),
+                                     [](auto a, auto b) { return a.second < b.second; });
+  return max_relief->second;
+}
 
-  State initial_state({0, 0, 0, 0});
-  std::queue<State> states;
-  states.push(initial_state);
-  StateSet visited_states{initial_state};
-  std::size_t max_pressure_relieved{0};
-  while (states.size() > 0) {
-    auto state = states.front();
-    states.pop();
-
-    if (all_valves_open(flow_rate, state.opened)) {
-      auto relieved = sim_to_end(state, flow_rate, time_budget);
-      max_pressure_relieved = std::max(relieved, max_pressure_relieved);
-      continue;
-    }
-
-    for (const auto dest : unopened_flowing(flow_rate, state.opened)) {
-      const auto cost = distance.at(state.position, dest) + 1;
-      const auto time_spent = state.time_spent + cost;
-      if (time_spent > time_budget) {
-        const auto relieved = sim_to_end(state, flow_rate, time_budget);
-        max_pressure_relieved = std::max(relieved, max_pressure_relieved);
-        continue;
-      }
-      // Build the new state of things
-      const auto new_state =
-          update_state(state, true, dest, sum_flow_rate(state, flow_rate) * cost, cost);
-
-      if (visited_states.find(new_state) == visited_states.end()) {
-        visited_states.insert(state);
-        states.push(new_state);
+int day16_2(std::istream *input_file) {
+  const auto states = bfs_on_states(input_file, 26);
+  std::size_t max_relief{0};
+  for (const auto [my_valves, my_relief] : states) {
+    for (const auto [elephant_valves, elephant_relief] : states) {
+      if ((my_valves & elephant_valves) == 0) {
+        max_relief = std::max(max_relief, my_relief + elephant_relief);
       }
     }
   }
-  return max_pressure_relieved;
+  return max_relief;
 }
-
-int day16_2(std::istream *input_file) { return 1; }
