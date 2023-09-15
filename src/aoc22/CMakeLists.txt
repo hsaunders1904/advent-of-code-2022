@@ -1,3 +1,5 @@
+find_package(OpenMP REQUIRED)
+
 set(DAYS
   01
   02
@@ -23,5 +25,6 @@ foreach(day ${DAYS})
   target_link_libraries("day${day}" PRIVATE aoc)
 endforeach()
 
-add_library(aoc SHARED ${SRC} "utils.cpp" "aoc.h")
+add_library(aoc SHARED ${SRC} "aoc.h" "utils.cpp" "utils.h")
+target_link_libraries(aoc PUBLIC OpenMP::OpenMP_CXX)
 set_target_properties(aoc PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS ON)

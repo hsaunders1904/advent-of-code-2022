@@ -1,5 +1,7 @@
 #include "aoc22/utils.h"
 
+#include <omp.h>
+
 #include <bitset>
 #include <istream>
 #include <map>
@@ -82,11 +84,11 @@ struct State {
   }
 };
 
-std::size_t sum_flow_rate(const State &state,
+std::size_t sum_flow_rate(const std::bitset<64> opened,
                           const std::vector<std::size_t> &flow_rate) {
   std::size_t flow_rate_sum{0};
   for (auto i = 0U; i < flow_rate.size(); ++i) {
-    if (state.opened[i]) {
+    if (opened[i]) {
       flow_rate_sum += flow_rate[i];
     }
   }
@@ -130,11 +132,11 @@ bfs_over_states(std::istream *input_file, const std::size_t time_budget) {
       }
 
       // Open another valve & push the new state to the queue
-      auto current_flow_rate = sum_flow_rate(state, flow_rate);
+      auto current_flow_rate = sum_flow_rate(state.opened, flow_rate);
       auto new_state = state.open_valve(other_valve, time_cost, current_flow_rate);
       if (new_state.time_remaining > 2) {
         // Progressing to another state can't be useful if there's only two units of time
-        // left. We need one to move somewhere, one to open a valve, and another to
+        // left. We need one unit to move somewhere, one to open a valve, and another to
         // relieve some pressure.
         state_queue.push(new_state);
       }
@@ -150,7 +152,6 @@ bfs_over_states(std::istream *input_file, const std::size_t time_budget) {
   }
   return state_to_max_relief;
 }
-
 } // namespace
 
 int day16_1(std::istream *input_file) {
@@ -163,10 +164,18 @@ int day16_1(std::istream *input_file) {
 int day16_2(std::istream *input_file) {
   const auto states = bfs_over_states(input_file, 26);
   std::size_t max_relief{0};
-  for (const auto [my_valves, my_relief] : states) {
-    for (const auto [elephant_valves, elephant_relief] : states) {
-      if ((my_valves & elephant_valves) == 0) {
-        max_relief = std::max(max_relief, my_relief + elephant_relief);
+#pragma omp parallel
+  {
+#pragma omp for reduction(max : max_relief)
+    for (auto b = 0U; b < states.bucket_count(); ++b) {
+      for (auto it = states.begin(b); it != states.end(b); ++it) {
+        auto my_valves = it->first;
+        auto my_relief = it->second;
+        for (const auto [elephant_valves, elephant_relief] : states) {
+          if ((my_valves & elephant_valves) == 0) {
+            max_relief = std::max(max_relief, my_relief + elephant_relief);
+          }
+        }
       }
     }
   }
