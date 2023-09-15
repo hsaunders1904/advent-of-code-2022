@@ -1,6 +1,5 @@
-#include "aoc22/aoc.h"
-
 #include <algorithm>
+#include <istream>
 #include <numeric>
 #include <vector>
 

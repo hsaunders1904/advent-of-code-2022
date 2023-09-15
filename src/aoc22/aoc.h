@@ -36,3 +36,5 @@ int day15_1(std::istream *input_file, int row_to_check);
 std::size_t day15_2(std::istream *input_file, int max_coord);
 int day16_1(std::istream *input_file);
 int day16_2(std::istream *input_file);
+int day17_1(std::istream *input_file);
+int day17_2(std::istream *input_file);

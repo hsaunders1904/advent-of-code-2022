@@ -1,6 +1,7 @@
-#include "aoc22/aoc.h"
+#include "aoc22/utils.h"
 
 #include <array>
+#include <istream>
 #include <unordered_set>
 
 namespace {
@@ -56,8 +57,7 @@ void update_tail(std::array<int, 2> *tail, const std::array<int, 2> &head) {
   }
 }
 
-int count_tail_positions(std::istream *input_file,
-                         const std::size_t num_knots) {
+int count_tail_positions(std::istream *input_file, const std::size_t num_knots) {
   std::vector<std::array<int, 2>> knots(num_knots);
   std::unordered_set<uint64_t> t_positions({encode_pos({0, 0})});
   for (std::string line; std::getline(*input_file, line);) {
@@ -74,10 +74,6 @@ int count_tail_positions(std::istream *input_file,
 }
 } // namespace
 
-int day09_1(std::istream *input_file) {
-  return count_tail_positions(input_file, 2);
-}
+int day09_1(std::istream *input_file) { return count_tail_positions(input_file, 2); }
 
-int day09_2(std::istream *input_file) {
-  return count_tail_positions(input_file, 10);
-}
+int day09_2(std::istream *input_file) { return count_tail_positions(input_file, 10); }

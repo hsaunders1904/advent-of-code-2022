@@ -1,6 +1,5 @@
-#include "aoc22/aoc.h"
-
 #include <array>
+#include <istream>
 
 namespace {
 std::pair<std::string, std::string> split(const std::string &str, const char split_str) {

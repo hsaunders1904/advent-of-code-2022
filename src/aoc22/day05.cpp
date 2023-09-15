@@ -1,6 +1,7 @@
-#include "aoc22/aoc.h"
+#include "aoc22/utils.h"
 
 #include <array>
+#include <istream>
 #include <numeric>
 #include <stack>
 

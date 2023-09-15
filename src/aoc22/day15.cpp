@@ -1,6 +1,5 @@
-#include "aoc22/aoc.h"
-
 #include <array>
+#include <istream>
 #include <regex>
 #include <unordered_map>
 #include <unordered_set>

@@ -1,6 +1,5 @@
-#include "aoc22/aoc.h"
-
 #include <array>
+#include <istream>
 #include <optional>
 #include <queue>
 #include <set>
@@ -95,8 +94,7 @@ breadth_first_search(const std::vector<std::vector<std::size_t>> &adjacency,
 std::size_t day12_1(std::istream *input_file) {
   auto landscape = read_landscape(input_file);
   auto adj_list = make_adjacency_list(landscape.elevation, landscape.width);
-  auto distance =
-      breadth_first_search(adj_list, landscape.start, landscape.end);
+  auto distance = breadth_first_search(adj_list, landscape.start, landscape.end);
   return distance.at(0);
 }
 

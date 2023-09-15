@@ -1,6 +1,7 @@
-#include "aoc22/aoc.h"
+#include "aoc22/utils.h"
 
 #include <array>
+#include <istream>
 #include <set>
 #include <unordered_map>
 
@@ -49,16 +50,15 @@ std::unordered_map<int, std::set<int>> map_rocks(std::istream *input) {
   return rocks;
 }
 
-bool is_filled(const std::unordered_map<int, std::set<int>> &waterfall,
-               const int depth, const int col) {
+bool is_filled(const std::unordered_map<int, std::set<int>> &waterfall, const int depth,
+               const int col) {
   return waterfall.find(depth) != waterfall.end() &&
          waterfall.at(depth).find(col) != waterfall.at(depth).end();
 }
 
 template <typename T> int max_key(const std::unordered_map<int, T> &map) {
-  return std::max_element(
-             map.begin(), map.end(),
-             [](const auto &a, const auto &b) { return a.first < b.first; })
+  return std::max_element(map.begin(), map.end(),
+                          [](const auto &a, const auto &b) { return a.first < b.first; })
       ->first;
 }
 

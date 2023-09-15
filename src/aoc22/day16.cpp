@@ -1,6 +1,7 @@
-#include "aoc22/aoc.h"
+#include "aoc22/utils.h"
 
 #include <bitset>
+#include <istream>
 #include <map>
 #include <numeric>
 #include <queue>

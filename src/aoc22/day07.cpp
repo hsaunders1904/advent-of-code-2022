@@ -1,5 +1,6 @@
-#include "aoc22/aoc.h"
+#include "aoc22/utils.h"
 
+#include <istream>
 #include <limits>
 #include <map>
 #include <numeric>

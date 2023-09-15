@@ -1,6 +1,7 @@
-#include "aoc22/aoc.h"
+#include "aoc22/utils.h"
 
 #include <functional>
+#include <istream>
 #include <list>
 #include <numeric>
 
@@ -101,8 +102,8 @@ u_int64_t simulate(std::vector<Monkey> *monkeys, const std::size_t num_rounds,
   for (auto i = 0U; i < num_rounds; ++i) {
     for (auto m_idx = 0U; m_idx < monkeys->size(); ++m_idx) {
       while (monkeys->at(m_idx).items.size() > 0) {
-        auto item_wl = wl_manager(
-            monkeys->at(m_idx).operation(monkeys->at(m_idx).items.front()));
+        auto item_wl =
+            wl_manager(monkeys->at(m_idx).operation(monkeys->at(m_idx).items.front()));
         inspection_count[m_idx]++;
         monkeys->at(m_idx).items.pop_front();
         auto throw_to = monkeys->at(m_idx).test(item_wl);
@@ -110,8 +111,7 @@ u_int64_t simulate(std::vector<Monkey> *monkeys, const std::size_t num_rounds,
       }
     }
   }
-  std::partial_sort(inspection_count.begin(),
-                    std::next(inspection_count.begin(), 2),
+  std::partial_sort(inspection_count.begin(), std::next(inspection_count.begin(), 2),
                     inspection_count.end(), std::greater<>());
   return inspection_count[0] * inspection_count[1];
 }
@@ -127,9 +127,9 @@ u_int64_t day11_2(std::istream *input_file) {
   // We must guard against 'worry level' integer overflows in this part.
   // We can take the 'worry level' modulo the product of all the divisors, to
   // get a smaller number that still has the same set of coprime divisors.
-  u_int64_t divisor_prod = std::accumulate(
-      monkeys.begin(), monkeys.end(), 1U,
-      [](const auto &acc, const auto &m) { return acc * m.divisor; });
+  u_int64_t divisor_prod =
+      std::accumulate(monkeys.begin(), monkeys.end(), 1U,
+                      [](const auto &acc, const auto &m) { return acc * m.divisor; });
   auto wl_manager = [divisor_prod](auto wl) { return wl % divisor_prod; };
   return simulate(&monkeys, 10000, wl_manager);
 }

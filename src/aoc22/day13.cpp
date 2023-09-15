@@ -1,5 +1,4 @@
-#include "aoc22/aoc.h"
-
+#include <istream>
 #include <regex>
 
 namespace {

@@ -1,4 +1,6 @@
-#include "aoc22/aoc.h"
+#include "aoc22/utils.h"
+
+#include <istream>
 
 namespace {
 constexpr auto ADDX = "addx";
@@ -18,8 +20,7 @@ void update_signal(int *signal, const int cycle_num, const int x_reg) {
   }
 }
 
-void update_display(std::string *display, const int cycle_num,
-                    const int x_reg) {
+void update_display(std::string *display, const int cycle_num, const int x_reg) {
   auto pixel_pos = (cycle_num - 1) % DISPLAY_WIDTH;
   if (pixel_pos == 0 && cycle_num != 1) {
     *display += "\n";

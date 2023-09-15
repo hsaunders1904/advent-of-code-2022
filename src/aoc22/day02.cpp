@@ -1,4 +1,4 @@
-#include "aoc22/aoc.h"
+#include <istream>
 
 /**
  * @brief Get the score for the given rock-paper-scissor choices.

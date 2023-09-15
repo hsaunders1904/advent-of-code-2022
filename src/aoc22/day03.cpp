@@ -1,6 +1,5 @@
-#include "aoc22/aoc.h"
-
 #include <array>
+#include <istream>
 
 namespace {
 int priority(const char character) {

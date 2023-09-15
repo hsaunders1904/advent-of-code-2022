@@ -1,11 +1,9 @@
-#include "aoc22/aoc.h"
-
 #include <array>
+#include <istream>
 #include <numeric>
 
 namespace {
-std::tuple<std::vector<std::size_t>, std::size_t>
-read_matrix(std::istream *input) {
+std::tuple<std::vector<std::size_t>, std::size_t> read_matrix(std::istream *input) {
   std::vector<std::size_t> heights;
   std::size_t width{0};
   for (std::string line; std::getline(*input, line);) {
