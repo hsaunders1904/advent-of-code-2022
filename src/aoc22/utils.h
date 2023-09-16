@@ -41,6 +41,8 @@ private:
   std::vector<T> m_data;
 };
 
+Vec2d<std::size_t> floyd_warshall(const std::vector<std::vector<std::size_t>> &adj_list);
+
 namespace details {
 struct Opts {
   std::string data_file;

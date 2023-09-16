@@ -1,7 +1,5 @@
 #include "aoc22/utils.h"
 
-#include <omp.h>
-
 #include <bitset>
 #include <istream>
 #include <map>
@@ -26,13 +24,13 @@ read_valves(std::istream *input) {
     leads_to[valve_name] = split(leads_to_str, ',');
   }
 
+  // Convert maps to vectors and valve IDs from strings to indices
   std::map<std::string, std::size_t> ids;
   std::size_t id{0};
   for (const auto &[valve_name, _] : flow_rates) {
     ids[valve_name] = id;
     ++id;
   }
-
   std::vector<std::size_t> flow_rate;
   std::vector<std::vector<std::size_t>> adj_list;
   for (const auto &[valve_name, id] : ids) {
@@ -44,26 +42,6 @@ read_valves(std::istream *input) {
     adj_list.emplace_back(adj);
   }
   return {flow_rate, adj_list};
-}
-
-Vec2d<std::size_t>
-floyd_warshall(const std::vector<std::vector<std::size_t>> &adj_list) {
-  Vec2d<std::size_t> dist(adj_list.size(), adj_list.size(),
-                          std::numeric_limits<std::size_t>::max() / 4);
-  for (auto i = 0U; i < adj_list.size(); ++i) {
-    dist.get(i, i) = 0;
-    for (auto neighbour : adj_list[i]) {
-      dist.get(i, neighbour) = 1;
-    }
-  }
-  for (auto k = 0U; k < adj_list.size(); ++k) {
-    for (auto i = 0U; i < adj_list.size(); ++i) {
-      for (auto j = 0U; j < adj_list.size(); ++j) {
-        dist.get(i, j) = std::min(dist.get(i, j), dist.get(i, k) + dist.get(k, j));
-      }
-    }
-  }
-  return dist;
 }
 
 struct State {
@@ -120,10 +98,6 @@ bfs_over_states(std::istream *input_file, const std::size_t time_budget) {
     state_queue.pop();
 
     for (auto other_valve : unopened_flowing(flow_rate, state.opened)) {
-      if (other_valve == state.position) {
-        continue;
-      }
-
       auto time_cost = distance.at(state.position, other_valve);
       if (time_cost + 1 >= state.time_remaining) {
         // + 1 & >= here, as for the journey to be useful, we need time to open the valve
@@ -162,22 +136,18 @@ int day16_1(std::istream *input_file) {
 }
 
 int day16_2(std::istream *input_file) {
-  const auto states = bfs_over_states(input_file, 26);
+  auto states = bfs_over_states(input_file, 26);
   std::size_t max_relief{0};
-#pragma omp parallel
-  {
-#pragma omp for reduction(max : max_relief)
-    for (auto b = 0U; b < states.bucket_count(); ++b) {
-      for (auto it = states.begin(b); it != states.end(b); ++it) {
-        auto my_valves = it->first;
-        auto my_relief = it->second;
-        for (const auto [elephant_valves, elephant_relief] : states) {
-          if ((my_valves & elephant_valves) == 0) {
-            max_relief = std::max(max_relief, my_relief + elephant_relief);
-          }
-        }
+  for (auto it = states.begin(); it != states.end();) {
+    auto my_valves = it->first;
+    auto my_relief = it->second;
+    for (const auto [elephant_valves, elephant_relief] : states) {
+      if ((my_valves & elephant_valves) == 0) {
+        max_relief = std::max(max_relief, my_relief + elephant_relief);
       }
     }
+    // Remove elements once they've been compared, so we're not checking them twice.
+    states.erase(it++);
   }
   return max_relief;
 }

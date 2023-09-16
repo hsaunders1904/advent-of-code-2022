@@ -4,6 +4,26 @@
 
 #include <sstream>
 
+Vec2d<std::size_t>
+floyd_warshall(const std::vector<std::vector<std::size_t>> &adj_list) {
+  Vec2d<std::size_t> dist(adj_list.size(), adj_list.size(),
+                          std::numeric_limits<std::size_t>::max() / 4);
+  for (auto i = 0U; i < adj_list.size(); ++i) {
+    dist.get(i, i) = 0;
+    for (auto neighbour : adj_list[i]) {
+      dist.get(i, neighbour) = 1;
+    }
+  }
+  for (auto k = 0U; k < adj_list.size(); ++k) {
+    for (auto i = 0U; i < adj_list.size(); ++i) {
+      for (auto j = 0U; j < adj_list.size(); ++j) {
+        dist.get(i, j) = std::min(dist.get(i, j), dist.get(i, k) + dist.get(k, j));
+      }
+    }
+  }
+  return dist;
+}
+
 std::vector<std::string> split(const std::string &str, const char split_on) {
   std::vector<std::string> parts;
   std::stringstream ss(str);
@@ -13,14 +33,12 @@ std::vector<std::string> split(const std::string &str, const char split_on) {
   return parts;
 }
 
-std::vector<std::string> split(const std::string &str,
-                               const std::string &split_on) {
+std::vector<std::string> split(const std::string &str, const std::string &split_on) {
   std::vector<std::string> parts;
   auto beg = str.begin();
   auto split_pos = str.begin();
   while (beg <= str.end()) {
-    split_pos =
-        std::find_first_of(beg, str.end(), split_on.begin(), split_on.end());
+    split_pos = std::find_first_of(beg, str.end(), split_on.begin(), split_on.end());
     parts.emplace_back(beg, split_pos);
     beg = std::next(split_pos, split_on.size());
   }
@@ -28,9 +46,9 @@ std::vector<std::string> split(const std::string &str,
 }
 
 void ltrim(std::string *str) {
-  str->erase(str->begin(),
-             std::find_if(str->begin(), str->end(),
-                          [](unsigned char ch) { return std::isalnum(ch); }));
+  str->erase(str->begin(), std::find_if(str->begin(), str->end(), [](unsigned char ch) {
+               return std::isalnum(ch);
+             }));
 }
 
 void rtrim(std::string *str) {
