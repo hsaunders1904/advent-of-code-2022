@@ -1,6 +1,9 @@
+#include <algorithm>
 #include <array>
 #include <istream>
 #include <numeric>
+#include <tuple>
+#include <vector>
 
 namespace {
 std::tuple<std::vector<std::size_t>, std::size_t> read_matrix(std::istream *input) {
