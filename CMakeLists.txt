@@ -9,7 +9,7 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 if(${CMAKE_CXX_COMPILER_ID} STREQUAL MSVC)
   add_compile_options("/W4")
 else()
-  add_compile_options("-pedantic" "-Wall" "-Wextra" "-O3")
+  add_compile_options("-pedantic" "-Wall" "-Wextra") #  "-O3")
 endif()
 
 include_directories(src)
