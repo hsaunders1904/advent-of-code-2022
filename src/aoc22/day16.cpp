@@ -85,13 +85,14 @@ std::vector<std::size_t> unopened_flowing(const std::vector<std::size_t> &flow_r
   return uof;
 }
 
-std::unordered_map<std::bitset<64>, std::size_t>
+std::pair<std::size_t, std::unordered_map<std::bitset<64>, std::size_t>>
 bfs_over_states(std::istream *input_file, const std::size_t time_budget) {
   const auto [flow_rate, adjacency_list] = read_valves(input_file);
   const auto distance = floyd_warshall(adjacency_list);
 
   std::queue<State> state_queue;
   state_queue.push({0, time_budget, 0, 0});
+  std::size_t max_relief{0};
   std::unordered_map<std::bitset<64>, std::size_t> state_to_max_relief;
   while (state_queue.size() > 0) {
     const auto state = state_queue.front();
@@ -120,27 +121,26 @@ bfs_over_states(std::istream *input_file, const std::size_t time_budget) {
       auto relief =
           new_state.pressure_relieved + new_flow_rate * new_state.time_remaining;
       // Store the maximum relief for the set of currently open valves
-      state_to_max_relief[new_state.opened] =
-          std::max(relief, state_to_max_relief[new_state.opened]);
+      if (relief > state_to_max_relief[new_state.opened]) {
+        state_to_max_relief[new_state.opened] = relief;
+        max_relief = std::max(max_relief, relief);
+      }
     }
   }
-  return state_to_max_relief;
+  return {max_relief, state_to_max_relief};
 }
 } // namespace
 
 int day16_1(std::istream *input_file) {
-  const auto states = bfs_over_states(input_file, 30);
-  auto max_relief = std::max_element(states.begin(), states.end(),
-                                     [](auto a, auto b) { return a.second < b.second; });
-  return max_relief->second;
+  auto [max_relief, _] = bfs_over_states(input_file, 30);
+  return max_relief;
 }
 
 int day16_2(std::istream *input_file) {
-  auto states = bfs_over_states(input_file, 26);
+  auto [_, states] = bfs_over_states(input_file, 26);
   std::size_t max_relief{0};
   for (auto it = states.begin(); it != states.end();) {
-    auto my_valves = it->first;
-    auto my_relief = it->second;
+    const auto [my_valves, my_relief] = *it;
     for (const auto [elephant_valves, elephant_relief] : states) {
       if ((my_valves & elephant_valves) == 0) {
         max_relief = std::max(max_relief, my_relief + elephant_relief);
