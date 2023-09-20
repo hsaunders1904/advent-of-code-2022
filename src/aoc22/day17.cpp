@@ -1,56 +1,41 @@
+#include <algorithm>
+#include <array>
+#include <bitset>
 #include <iostream>
 #include <istream>
-#include <regex>
-#include <sstream>
-#include <unordered_set>
+#include <unordered_map>
+#include <vector>
 
 namespace {
 using Rock = std::array<std::bitset<7>, 4>;
 
-/*
-.......
-.......
-.......
-..XXXX.
-*/
+/* .......
+   .......
+   .......
+   ..XXXX.  */
 constexpr Rock SHAPE_MINUS = {0b0011110, 0, 0, 0};
-/*
-.......
-...X...
-..XXX..
-...X...
-*/
+/* .......
+   ...X...
+   ..XXX..
+   ...X...  */
 constexpr Rock SHAPE_PLUS = {0b0001000, 0b0011100, 0b0001000, 0};
-/*
-.......
-....X..
-....X..
-..XXX...
-*/
+/* .......
+   ....X..
+   ....X..
+   ..XXX...  */
 constexpr Rock SHAPE_J = {0b0011100, 0b0000100, 0b0000100, 0};
-/*
-..X....
-..X....
-..X....
-..X....
-*/
+/* ..X....
+   ..X....
+   ..X....
+   ..X....  */
 constexpr Rock SHAPE_I = {0b0010000, 0b0010000, 0b0010000, 0b0010000};
-/*
-.......
-.......
-..XX...
-..XX...
-*/
+/* .......
+   .......
+   ..XX...
+   ..XX...  */
 constexpr Rock SHAPE_O = {0b0011000, 0b0011000, 0, 0};
-
 constexpr std::array<Rock, 5> SHAPES = {SHAPE_MINUS, SHAPE_PLUS, SHAPE_J, SHAPE_I,
                                         SHAPE_O};
-
-std::string regex_replace(const std::string &str, const std::string &pattern,
-                          const std::string &new_str) {
-  std::regex re(pattern);
-  return std::regex_replace(str, re, new_str);
-}
 
 struct VecHasher {
   std::size_t operator()(const std::vector<std::size_t> &a) const {
@@ -63,8 +48,8 @@ struct VecHasher {
 };
 
 struct Chamber {
-  Chamber();
-  void new_rock();
+  explicit Chamber(std::size_t rock);
+  void new_rock(std::size_t rock_id);
   void apply_jet(char direction);
   bool move_down();
   void fix_rock();
@@ -73,8 +58,6 @@ struct Chamber {
 
   Rock rock;
   std::size_t rock_pos;
-  std::size_t num_turns{2022};
-  std::size_t rock_ctr{0};
   std::vector<std::bitset<7>> pile{};
 
 private:
@@ -86,11 +69,11 @@ private:
   bool overlaps_pile(const Rock &rock) const;
 };
 
-Chamber::Chamber() { new_rock(); }
+Chamber::Chamber(const std::size_t rock) { new_rock(rock); }
 
-void Chamber::new_rock() {
+void Chamber::new_rock(const std::size_t rock_id) {
   strip_top_of_pile();
-  rock = SHAPES[rock_ctr++ % SHAPES.size()];
+  rock = SHAPES[rock_id % SHAPES.size()];
   rock_pos = pile.size() + 3;
   for (auto i = 0U; i < 3U + rock.size(); ++i) {
     pile.emplace_back(0);
@@ -106,7 +89,7 @@ void Chamber::apply_jet(char direction) {
     move_right();
     break;
   default:
-    throw std::runtime_error("invalid jet");
+    throw std::runtime_error("invalid jet: " + std::to_string(direction));
   }
 }
 
@@ -187,23 +170,6 @@ bool Chamber::can_move_down() const {
   return true;
 }
 
-std::string Chamber::to_string() const {
-  std::stringstream ss;
-  auto chamber = pile;
-  // Add the current rock to the pile
-  for (auto i = 0U; i < rock.size(); ++i) {
-    chamber[rock_pos + i] |= rock[i];
-  }
-  // Draw the pile
-  for (auto it = chamber.rbegin(); it != chamber.rend(); ++it) {
-    ss << "|" << *it << "|\n";
-  }
-  ss << "+-------+\n";
-
-  std::string out = regex_replace(ss.str(), "0", ".");
-  return regex_replace(out, "1", "#");
-}
-
 void Chamber::strip_top_of_pile() {
   for (auto it = pile.rbegin(); it != pile.rend();) {
     if (!(it++)->any()) {
@@ -225,13 +191,14 @@ int day17_1(std::istream *input_file) {
   auto jets = read_jets(input_file);
   constexpr std::size_t rocks_to_fall{2022};
   std::size_t jet_ctr{0};
+  std::size_t rock_ctr{0};
 
-  Chamber chamber;
-  while (chamber.rock_ctr < rocks_to_fall + 1) {
+  Chamber chamber(rock_ctr++);
+  while (rock_ctr < rocks_to_fall + 1) {
     chamber.apply_jet(jets[jet_ctr++ % jets.size()]);
     if (!chamber.move_down()) {
       chamber.fix_rock();
-      chamber.new_rock();
+      chamber.new_rock(rock_ctr++);
     }
   }
   chamber.strip_top_of_pile();
@@ -240,9 +207,9 @@ int day17_1(std::istream *input_file) {
 
 std::size_t day17_2(std::istream *input_file) {
   constexpr std::size_t rocks_to_fall{1'000'000'000'000};
-
   auto jets = read_jets(input_file);
   std::size_t jet_ctr{0};
+  std::size_t rock_ctr{0};
 
   // Maps the 'state' of the chamber (jet no., rock no., & top 4 rows) to the rock no.
   // and the height at that state.
@@ -251,40 +218,40 @@ std::size_t day17_2(std::istream *input_file) {
       seen_states;
   std::vector<std::size_t> heights;
 
-  Chamber chamber;
-  while (chamber.rock_ctr < rocks_to_fall + 1) {
+  Chamber chamber(rock_ctr++);
+  while (rock_ctr < rocks_to_fall + 1) {
     chamber.apply_jet(jets[jet_ctr++ % jets.size()]);
     if (!chamber.move_down()) {
       chamber.fix_rock();
 
-      std::vector<std::size_t> state = {
-          jet_ctr % jets.size(),
-          chamber.rock_ctr % SHAPES.size(),
-      };
+      // Build the current state
+      std::vector<std::size_t> state = {jet_ctr % jets.size(), rock_ctr % SHAPES.size()};
       for (auto i = 0U; i < 4; ++i) {
+        // This only looks at the top 4 rows of the pile, so may not work for all inputs.
         state.emplace_back(chamber.pile[chamber.pile.size() - i - 1].to_ullong());
       }
 
       if (seen_states.find(state) == seen_states.end()) {
-        seen_states.insert({state, {chamber.rock_ctr, chamber.pile.size()}});
+        seen_states.insert({state, {rock_ctr, chamber.pile.size()}});
       } else {
-        auto [n_before_cycle, height_before_cycle] = seen_states[state];
-        auto cycle_width = chamber.rock_ctr - n_before_cycle;
-        --n_before_cycle;
+        // If we've seen the state before, we're in a cycle, so we can stop simulating
+        auto [cycle_start, height_before_cycles] = seen_states[state];
+        auto cycle_width = rock_ctr - cycle_start;
+        auto n_before_cycle = cycle_start - 1;
 
-        auto height_of_cycle = chamber.pile.size() - height_before_cycle;
+        auto height_of_cycle = chamber.pile.size() - height_before_cycles;
         auto n_cycle_repeats = (rocks_to_fall - n_before_cycle) / cycle_width;
         std::size_t height_of_cycles = n_cycle_repeats * height_of_cycle;
 
         std::size_t remaining_cycles = (rocks_to_fall - n_before_cycle) % cycle_width;
-        auto height_after_cycles =
+        auto partial_cycle_height =
             heights[n_before_cycle + remaining_cycles - 1] - heights[n_before_cycle];
 
-        return height_before_cycle + height_of_cycles + height_after_cycles;
+        return height_before_cycles + height_of_cycles + partial_cycle_height;
       }
 
       heights.emplace_back(chamber.pile.size());
-      chamber.new_rock();
+      chamber.new_rock(rock_ctr++);
     }
   }
   return chamber.pile.size();
