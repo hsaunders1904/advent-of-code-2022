@@ -282,4 +282,17 @@ constexpr auto day16 = "Valve AA has flow rate=0; tunnels lead to valves DD, II,
                        "Valve II has flow rate=0; tunnels lead to valves AA, JJ\n"
                        "Valve JJ has flow rate=21; tunnel leads to valve II\n";
 constexpr auto day17 = ">>><<><>><<<>><>>><<<>>><<<><<<>><>><<>>\n";
+constexpr auto day18 = "2,2,2\n"
+                       "1,2,2\n"
+                       "3,2,2\n"
+                       "2,1,2\n"
+                       "2,3,2\n"
+                       "2,2,1\n"
+                       "2,2,3\n"
+                       "2,2,4\n"
+                       "2,2,6\n"
+                       "1,2,5\n"
+                       "3,2,5\n"
+                       "2,1,5\n"
+                       "2,3,5\n";
 } // namespace data
