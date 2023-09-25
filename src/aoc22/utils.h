@@ -17,6 +17,16 @@ void ltrim(std::string *str);
 void rtrim(std::string *str);
 void trim(std::string *str);
 
+template <typename T> struct SequenceHasher {
+  typename T::value_type operator()(const T &a) const {
+    typename T::value_type h = 0;
+    for (auto e : a) {
+      h ^= std::hash<typename T::value_type>{}(e) + 0x9e3779b9 + (h << 6) + (h >> 2);
+    }
+    return h;
+  }
+};
+
 template <typename T> class Vec2d {
 public:
   Vec2d(std::size_t rows, std::size_t cols, T initial_value)

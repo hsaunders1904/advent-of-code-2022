@@ -1,3 +1,5 @@
+#include "aoc22/utils.h"
+
 #include <algorithm>
 #include <array>
 #include <bitset>
@@ -36,16 +38,6 @@ constexpr Rock SHAPE_I = {0b0010000, 0b0010000, 0b0010000, 0b0010000};
 constexpr Rock SHAPE_O = {0b0011000, 0b0011000, 0, 0};
 constexpr std::array<Rock, 5> SHAPES = {SHAPE_MINUS, SHAPE_PLUS, SHAPE_J, SHAPE_I,
                                         SHAPE_O};
-
-struct VecHasher {
-  std::size_t operator()(const std::vector<std::size_t> &a) const {
-    std::size_t h = 0;
-    for (auto e : a) {
-      h ^= std::hash<std::size_t>{}(e) + 0x9e3779b9 + (h << 6) + (h >> 2);
-    }
-    return h;
-  }
-};
 
 struct Chamber {
   explicit Chamber(std::size_t rock);
@@ -214,7 +206,7 @@ std::size_t day17_2(std::istream *input_file) {
   // Maps the 'state' of the chamber (jet no., rock no., & top 4 rows) to the rock no.
   // and the height at that state.
   std::unordered_map<std::vector<std::size_t>, std::pair<std::size_t, std::size_t>,
-                     VecHasher>
+                     SequenceHasher<std::vector<std::size_t>>>
       seen_states;
   std::vector<std::size_t> heights;
 
