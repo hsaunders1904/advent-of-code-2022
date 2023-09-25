@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <istream>
 #include <numeric>
+#include <string>
 #include <vector>
 
 int day01_1(std::istream *input_file) {

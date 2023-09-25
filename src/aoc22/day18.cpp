@@ -50,17 +50,16 @@ std::array<std::array<int, 2>, 3> find_cube_limits(const T &cubes) {
 int day18_1(std::istream *input_file) {
   auto cubes = read_cubes_to_vector(input_file);
 
-  std::vector<std::size_t> n_neighbours(cubes.size());
-  for (auto i = 0U; i < cubes.size(); ++i) {
-    for (const auto &candidate_neighbour : cubes) {
-      if (are_neighbours(cubes[i], candidate_neighbour)) {
-        n_neighbours[i]++;
+  int n_adjacent_faces{0};
+  for (auto i = 1U; i < cubes.size(); ++i) {
+    for (auto j = 0U; j < i; ++j) {
+      if (are_neighbours(cubes[i], cubes[j])) {
+        n_adjacent_faces += 2;
       }
     }
   }
-  int max_n_free_faces = 6 * n_neighbours.size();
-  return std::accumulate(n_neighbours.begin(), n_neighbours.end(), max_n_free_faces,
-                         [](auto acc, auto x) { return acc - x; });
+  int max_n_free_faces = 6 * cubes.size();
+  return max_n_free_faces - n_adjacent_faces;
 }
 
 int day18_2(std::istream *input_file) {

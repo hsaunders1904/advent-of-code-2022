@@ -7,10 +7,10 @@
 
 namespace {
 struct Monkey {
-  std::list<u_int64_t> items;
-  std::function<u_int64_t(u_int64_t)> operation;
-  std::function<std::size_t(u_int64_t)> test;
-  u_int64_t divisor;
+  std::list<uint64_t> items;
+  std::function<uint64_t(uint64_t)> operation;
+  std::function<std::size_t(uint64_t)> test;
+  uint64_t divisor;
 };
 
 void getline_with_trim(std::istream *input, std::string *line) {
@@ -18,9 +18,9 @@ void getline_with_trim(std::istream *input, std::string *line) {
   trim(line);
 }
 
-std::list<u_int64_t> parse_items(const std::string &line) {
+std::list<uint64_t> parse_items(const std::string &line) {
   auto str_items = split(split(line, ':')[1], ',');
-  std::list<u_int64_t> items(str_items.size());
+  std::list<uint64_t> items(str_items.size());
   std::transform(str_items.begin(), str_items.end(), items.begin(), [](auto x) {
     trim(&x);
     return std::stoi(x);
@@ -28,27 +28,27 @@ std::list<u_int64_t> parse_items(const std::string &line) {
   return items;
 }
 
-std::function<u_int64_t(u_int64_t)> parse_operation(const std::string &line) {
+std::function<uint64_t(uint64_t)> parse_operation(const std::string &line) {
   auto eqn_parts = split(split(line, ':')[1], ' ');
-  std::function<u_int64_t(u_int64_t, u_int64_t)> op;
+  std::function<uint64_t(uint64_t, uint64_t)> op;
   switch (eqn_parts[4][0]) {
   case '*':
-    op = std::multiplies<u_int64_t>();
+    op = std::multiplies<uint64_t>();
     break;
   case '+':
-    op = std::plus<u_int64_t>();
+    op = std::plus<uint64_t>();
     break;
   default:
     throw std::runtime_error("Unrecognised operation");
   }
   if (eqn_parts[5] == "old") {
-    return [op](const u_int64_t old) { return op(old, old); };
+    return [op](const uint64_t old) { return op(old, old); };
   }
   auto operand = std::stoi(eqn_parts[5]);
-  return [op, operand](const u_int64_t old) { return op(old, operand); };
+  return [op, operand](const uint64_t old) { return op(old, operand); };
 }
 
-std::pair<std::function<std::size_t(u_int64_t)>, u_int64_t>
+std::pair<std::function<std::size_t(uint64_t)>, uint64_t>
 parse_test(std::istream *input) {
   std::string line;
   getline_with_trim(input, &line);
@@ -58,7 +58,7 @@ parse_test(std::istream *input) {
   std::size_t true_monkey = std::stoul(split(line, ' ')[5]);
   getline_with_trim(input, &line);
   std::size_t false_monkey = std::stoul(split(line, ' ')[5]);
-  auto test_func = [divisor, true_monkey, false_monkey](const u_int64_t x) {
+  auto test_func = [divisor, true_monkey, false_monkey](const uint64_t x) {
     if (x % divisor == 0) {
       return true_monkey;
     } else {
@@ -96,9 +96,9 @@ std::vector<Monkey> read_monkeys(std::istream *input) {
   return monkeys;
 }
 
-u_int64_t simulate(std::vector<Monkey> *monkeys, const std::size_t num_rounds,
-                   std::function<u_int64_t(u_int64_t)> wl_manager) {
-  std::vector<u_int64_t> inspection_count(monkeys->size());
+uint64_t simulate(std::vector<Monkey> *monkeys, const std::size_t num_rounds,
+                   std::function<uint64_t(uint64_t)> wl_manager) {
+  std::vector<uint64_t> inspection_count(monkeys->size());
   for (auto i = 0U; i < num_rounds; ++i) {
     for (auto m_idx = 0U; m_idx < monkeys->size(); ++m_idx) {
       while (monkeys->at(m_idx).items.size() > 0) {
@@ -117,18 +117,18 @@ u_int64_t simulate(std::vector<Monkey> *monkeys, const std::size_t num_rounds,
 }
 } // namespace
 
-u_int64_t day11_1(std::istream *input_file) {
+uint64_t day11_1(std::istream *input_file) {
   auto monkeys = read_monkeys(input_file);
   return simulate(&monkeys, 20, [](auto wl) { return wl / 3; });
 }
 
-u_int64_t day11_2(std::istream *input_file) {
+uint64_t day11_2(std::istream *input_file) {
   auto monkeys = read_monkeys(input_file);
   // We must guard against 'worry level' integer overflows in this part.
   // We can take the 'worry level' modulo the product of all the divisors, to
   // get a smaller number that still has the same set of coprime divisors.
-  u_int64_t divisor_prod =
-      std::accumulate(monkeys.begin(), monkeys.end(), 1U,
+  uint64_t divisor_prod =
+      std::accumulate(monkeys.begin(), monkeys.end(), 1ULL,
                       [](const auto &acc, const auto &m) { return acc * m.divisor; });
   auto wl_manager = [divisor_prod](auto wl) { return wl % divisor_prod; };
   return simulate(&monkeys, 10000, wl_manager);

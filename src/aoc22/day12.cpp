@@ -5,6 +5,7 @@
 #include <optional>
 #include <queue>
 #include <set>
+#include <string>
 
 namespace {
 struct Landscape {

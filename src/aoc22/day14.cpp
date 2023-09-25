@@ -52,8 +52,7 @@ std::unordered_map<int, std::set<int>> map_rocks(std::istream *input) {
 
 bool is_filled(const std::unordered_map<int, std::set<int>> &waterfall, const int depth,
                const int col) {
-  return waterfall.find(depth) != waterfall.end() &&
-         waterfall.at(depth).find(col) != waterfall.at(depth).end();
+  return waterfall.contains(depth) && waterfall.at(depth).contains(col);
 }
 
 template <typename T> int max_key(const std::unordered_map<int, T> &map) {

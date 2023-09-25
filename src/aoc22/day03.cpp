@@ -1,5 +1,6 @@
 #include <array>
 #include <istream>
+#include <string>
 
 namespace {
 int priority(const char character) {

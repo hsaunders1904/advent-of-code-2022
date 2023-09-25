@@ -35,8 +35,8 @@ inline uint64_t encode_pos(const std::array<int, 2> &pos) {
   // Store x in the first 32 bits and y in the final 32, to give us a unique
   // 64-bit integer we can insert into a set
   constexpr uint64_t size_of_int{32};
-  return static_cast<uint64_t>(static_cast<uint>(pos[0])) << size_of_int |
-         static_cast<uint>(pos[1]);
+  return static_cast<uint64_t>(static_cast<uint32_t>(pos[0])) << size_of_int |
+         static_cast<uint32_t>(pos[1]);
 }
 
 void update_tail(std::array<int, 2> *tail, const std::array<int, 2> &head) {

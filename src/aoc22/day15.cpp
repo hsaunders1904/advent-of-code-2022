@@ -1,4 +1,5 @@
 #include <array>
+#include <cstdint>
 #include <istream>
 #include <regex>
 #include <unordered_map>
@@ -19,8 +20,8 @@ struct PosHash {
     // No need for a proper hash here. Just use the first 32 bits to store x, and the
     // final 32 to store y.
     constexpr uint64_t size_of_int{32};
-    return static_cast<uint64_t>(static_cast<uint>(pos[0])) << size_of_int |
-           static_cast<uint>(pos[1]);
+    return static_cast<uint64_t>(static_cast<uint32_t>(pos[0])) << size_of_int |
+           static_cast<uint32_t>(pos[1]);
   }
 };
 

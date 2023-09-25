@@ -1,4 +1,5 @@
 #include <istream>
+#include <string>
 
 /**
  * @brief Get the score for the given rock-paper-scissor choices.

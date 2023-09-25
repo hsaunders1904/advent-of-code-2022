@@ -40,6 +40,9 @@ std::vector<std::string> split(const std::string &str, const std::string &split_
   while (beg <= str.end()) {
     split_pos = std::find_first_of(beg, str.end(), split_on.begin(), split_on.end());
     parts.emplace_back(beg, split_pos);
+    if (split_pos == str.end()) {
+      break;
+    }
     beg = std::next(split_pos, split_on.size());
   }
   return parts;

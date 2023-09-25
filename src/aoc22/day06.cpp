@@ -1,5 +1,6 @@
 #include <istream>
 #include <set>
+#include <string>
 
 namespace {
 int find_distinct_char_idx(const std::string &signal, const std::size_t window_size) {

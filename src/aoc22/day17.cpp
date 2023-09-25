@@ -163,8 +163,8 @@ bool Chamber::can_move_down() const {
 }
 
 void Chamber::strip_top_of_pile() {
-  for (auto it = pile.rbegin(); it != pile.rend();) {
-    if (!(it++)->any()) {
+  while (pile.size() > 0) {
+    if (!pile.back().any()) {
       pile.pop_back();
     } else {
       return;
@@ -179,7 +179,7 @@ std::string read_jets(std::istream *input_file) {
 }
 } // namespace
 
-int day17_1(std::istream *input_file) {
+std::size_t day17_1(std::istream *input_file) {
   auto jets = read_jets(input_file);
   constexpr std::size_t rocks_to_fall{2022};
   std::size_t jet_ctr{0};
@@ -218,9 +218,9 @@ std::size_t day17_2(std::istream *input_file) {
 
       // Build the current state
       std::vector<std::size_t> state = {jet_ctr % jets.size(), rock_ctr % SHAPES.size()};
-      for (auto i = 0U; i < 4; ++i) {
+      for (auto i = 0U; i < std::min(4UL, chamber.pile.size()); ++i) {
         // This only looks at the top 4 rows of the pile, so may not work for all inputs.
-        state.emplace_back(chamber.pile[chamber.pile.size() - i - 1].to_ullong());
+        state.emplace_back(chamber.pile.at(chamber.pile.size() - i - 1).to_ullong());
       }
 
       if (seen_states.find(state) == seen_states.end()) {

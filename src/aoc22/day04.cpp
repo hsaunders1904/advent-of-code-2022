@@ -1,9 +1,13 @@
 #include <array>
 #include <istream>
+#include <string>
 
 namespace {
 std::pair<std::string, std::string> split(const std::string &str, const char split_str) {
   auto split_pos = str.find(split_str);
+  if (split_pos == str.size()) {
+    return {str, ""};
+  }
   auto first = str.substr(0, split_pos);
   auto second = str.substr(split_pos + 1, str.size());
   return {first, second};

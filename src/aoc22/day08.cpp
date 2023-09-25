@@ -2,6 +2,7 @@
 #include <array>
 #include <istream>
 #include <numeric>
+#include <string>
 #include <tuple>
 #include <vector>
 
