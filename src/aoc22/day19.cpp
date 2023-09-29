@@ -1,8 +1,8 @@
 #include <array>
+#include <deque>
 #include <iostream>
 #include <istream>
 #include <numeric>
-#include <queue>
 #include <regex>
 #include <string>
 
@@ -55,47 +55,42 @@ struct BlueprintState {
   BlueprintState(Blueprint blueprint, int max_time)
       : blueprint(std::move(blueprint)), time_remaining(max_time) {}
 
-  bool can_build_robot(const int robot_type) {
+  bool build_robot(int robot_type) {
     switch (robot_type) {
     case ORE:
-      return materials[ORE] >= blueprint.ore_cost;
+      if (materials[ORE] >= blueprint.ore_cost) {
+        materials[ORE] -= blueprint.ore_cost;
+        break;
+      }
+      return false;
     case CLAY:
-      return materials[ORE] >= blueprint.clay_cost;
+      if (materials[ORE] >= blueprint.clay_cost) {
+        materials[ORE] -= blueprint.clay_cost;
+        break;
+      }
+      return false;
     case OBSIDIAN:
-      return materials[ORE] >= blueprint.obsidian_cost.first &&
-             materials[CLAY] >= blueprint.obsidian_cost.second;
+      if (materials[ORE] >= blueprint.obsidian_cost.first &&
+          materials[CLAY] >= blueprint.obsidian_cost.second) {
+        materials[ORE] -= blueprint.obsidian_cost.first;
+        materials[CLAY] -= blueprint.obsidian_cost.second;
+        break;
+      }
+      return false;
     case GEODE:
-      return materials[ORE] >= blueprint.geode_cost.first &&
-             materials[OBSIDIAN] >= blueprint.geode_cost.second;
+      if (materials[ORE] >= blueprint.geode_cost.first &&
+          materials[OBSIDIAN] >= blueprint.geode_cost.second) {
+        materials[ORE] -= blueprint.geode_cost.first;
+        materials[OBSIDIAN] -= blueprint.geode_cost.second;
+        break;
+      }
+      return false;
     default:
       std::runtime_error("invalid material");
     }
-    return false;
-  }
-
-  BlueprintState build_robot(int robot_type) const {
-    BlueprintState new_state = *this;
-    new_state.advance_time();
-    new_state.robots[robot_type] += 1;
-    switch (robot_type) {
-    case ORE:
-      new_state.materials[ORE] -= blueprint.ore_cost;
-      break;
-    case CLAY:
-      new_state.materials[ORE] -= blueprint.clay_cost;
-      break;
-    case OBSIDIAN:
-      new_state.materials[ORE] -= blueprint.obsidian_cost.first;
-      new_state.materials[CLAY] -= blueprint.obsidian_cost.second;
-      break;
-    case GEODE:
-      new_state.materials[ORE] -= blueprint.geode_cost.first;
-      new_state.materials[OBSIDIAN] -= blueprint.geode_cost.second;
-      break;
-    default:
-      std::runtime_error("invalid material");
-    }
-    return new_state;
+    advance_time();
+    robots[robot_type] += 1;
+    return true;
   }
 
   void advance_time() {
@@ -126,12 +121,12 @@ std::array<int, 4> get_max_spends(const Blueprint &blueprint) {
 int max_n_geodes_for_blueprint(const Blueprint &blueprint, const int max_time) {
   auto max_spends = get_max_spends(blueprint);
 
-  std::queue<BlueprintState> states;
-  states.push(BlueprintState(blueprint, max_time));
+  std::deque<BlueprintState> states;
+  states.push_back(BlueprintState(blueprint, max_time));
   int max_n_geodes{0};
   while (states.size() > 0) {
     auto state = states.front();
-    states.pop();
+    states.pop_front();
 
     auto geodes_possible =
         state.materials[GEODE] + state.robots[GEODE] * state.time_remaining;
@@ -139,37 +134,43 @@ int max_n_geodes_for_blueprint(const Blueprint &blueprint, const int max_time) {
 
     for (auto robot_type = 0; robot_type < 4; ++robot_type) {
       auto new_state = state;
+      // We can't make obsidian if we have no clay robots
       if (robot_type == OBSIDIAN && new_state.robots[CLAY] == 0) {
-        // We can't make obsidian if we have no clay robots
         continue;
       }
+      // We can't make geode if we have no obsidian robots
       if (robot_type == GEODE && new_state.robots[OBSIDIAN] == 0) {
-        // We can't make geode if we have no obsidian robots
         continue;
       }
+      // There's no point making new robots if we can't, per minute, spend what they
+      // make
       if (new_state.robots[robot_type] >= max_spends[robot_type]) {
-        // There's no point making new robots if we can't, per minute, spend what they
-        // make
         continue;
       }
-      while (!new_state.can_build_robot(robot_type)) {
+      // If we build and mine a geode robot on every step from now, can we beat the
+      // current best?
+      // n_geodes + n_robots*t + t*(t - 1)/2
+      auto geode_limit = new_state.materials[GEODE] +
+                         new_state.robots[GEODE] * state.time_remaining +
+                         state.time_remaining * (state.time_remaining - 1) / 2;
+      if (geode_limit < max_n_geodes) {
+        continue;
+      }
+
+      // Fast forward until we can build another robot
+      while (!new_state.build_robot(robot_type)) {
         new_state.advance_time();
       }
-      new_state = new_state.build_robot(robot_type);
-
-      // If we build build a geode robot and mine a geode on every step from now,
-      // can we beat the current best?
-      // n_geodes + n_robots*t + t*(t - 1)/2
-      auto n_geodes = new_state.materials[GEODE];
-      auto n_geode_robots = new_state.robots[GEODE];
-      if (n_geodes + n_geode_robots * state.time_remaining +
-              state.time_remaining * (state.time_remaining - 1) / 2 <
-          max_n_geodes) {
+      if (new_state.time_remaining <= 0) {
         continue;
       }
-
-      if (new_state.time_remaining > 0) {
-        states.push(new_state);
+      // Optimise by pushing states with higher value materials to the front of the
+      // queue, we can then more efficiently discard states that are less likely to be
+      // optimal
+      if (robot_type == GEODE || robot_type == OBSIDIAN) {
+        states.push_front(new_state);
+      } else {
+        states.push_back(new_state);
       }
     }
   }
