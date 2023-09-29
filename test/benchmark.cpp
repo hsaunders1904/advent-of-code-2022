@@ -64,5 +64,7 @@ AOC_BENCHMARK(BM_day17_1, day17_1, "../data/day17.txt");
 AOC_BENCHMARK(BM_day17_2, day17_2, "../data/day17.txt");
 AOC_BENCHMARK(BM_day18_1, day18_1, "../data/day18.txt");
 AOC_BENCHMARK(BM_day18_2, day18_2, "../data/day18.txt");
+AOC_BENCHMARK(BM_day19_1, day19_1, "../data/day19.txt");
+AOC_BENCHMARK(BM_day19_2, day19_2, "../data/day19.txt");
 
 BENCHMARK_MAIN();

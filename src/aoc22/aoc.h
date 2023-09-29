@@ -40,3 +40,5 @@ int day17_1(std::istream *input_file);
 std::size_t day17_2(std::istream *input_file);
 int day18_1(std::istream *input_file);
 int day18_2(std::istream *input_file);
+int day19_1(std::istream *input_file);
+int day19_2(std::istream *input_file);
