@@ -10,7 +10,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 if(${CMAKE_CXX_COMPILER_ID} STREQUAL MSVC)
   add_compile_options("/W4")
 else()
-  add_compile_options("-pedantic" "-Wall" "-Wextra" "-O3")
+  add_compile_options("-pedantic" "-Wall" "-Wextra")
 endif()
 
 include_directories(src)
