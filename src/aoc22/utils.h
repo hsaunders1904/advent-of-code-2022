@@ -16,6 +16,7 @@ std::vector<std::string> split(const std::string &str, const std::string &split_
 void ltrim(std::string *str);
 void rtrim(std::string *str);
 void trim(std::string *str);
+long euclidean_remainder(long a, long b);
 
 template <typename T> struct SequenceHasher {
   typename T::value_type operator()(const T &a) const {
@@ -37,13 +38,14 @@ public:
   }
   std::array<std::size_t, 2> size() const { return m_size; }
 
-  friend void operator<<(std::ostream &os, const Vec2d<T> &vec) {
+  friend std::ostream &operator<<(std::ostream &os, const Vec2d<T> &vec) {
     for (auto i = 0U; i < vec.size()[0]; ++i) {
       for (auto j = 0U; j < vec.size()[1]; ++j) {
         os << vec.at(i, j) << " ";
       }
       os << "\n";
     }
+    return os;
   }
 
 private:

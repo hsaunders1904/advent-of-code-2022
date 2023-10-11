@@ -1,3 +1,5 @@
+#include "aoc22/utils.h"
+
 #include <iostream>
 #include <istream>
 #include <string>
@@ -19,11 +21,6 @@ template <typename T> std::vector<T> range(std::size_t n) {
     vec.emplace_back(i);
   }
   return vec;
-}
-
-long euclidean_remainder(const long a, const long b) {
-  auto r = a % b;
-  return r >= 0 ? r : r + std::abs(b);
 }
 
 void mix_indices(std::vector<std::size_t> *idxs, const std::vector<long> &numbers) {

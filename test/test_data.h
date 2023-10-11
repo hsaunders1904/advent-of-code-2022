@@ -323,4 +323,18 @@ constexpr auto day21 = "root: pppw + sjmn\n"
                        "lgvd: ljgn * ptdq\n"
                        "drzm: hmdt - zczc\n"
                        "hmdt: 32\n";
+constexpr auto day22 = "        ...#\n"
+                       "        .#..\n"
+                       "        #...\n"
+                       "        ....\n"
+                       "...#.......#\n"
+                       "........#...\n"
+                       "..#....#....\n"
+                       "..........#.\n"
+                       "        ...#....\n"
+                       "        .....#..\n"
+                       "        .#......\n"
+                       "        ......#.\n"
+                       "\n"
+                       "10R5L5R10L4R5L5\n";
 } // namespace data

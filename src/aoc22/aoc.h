@@ -46,3 +46,5 @@ long day20_1(std::istream *input_file);
 long day20_2(std::istream *input_file);
 long day21_1(std::istream *input_file);
 long day21_2(std::istream *input_file);
+int day22_1(std::istream *input_file);
+int day22_2(std::istream *input_file);

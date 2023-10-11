@@ -66,6 +66,11 @@ void trim(std::string *str) {
   rtrim(str);
 }
 
+long euclidean_remainder(const long a, const long b) {
+  auto r = a % b;
+  return r >= 0 ? r : r + std::abs(b);
+}
+
 namespace details {
 std::ifstream open_file(const std::string &path) {
   std::ifstream stream(path);
