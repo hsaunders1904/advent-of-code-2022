@@ -332,3 +332,24 @@ TEST(day22, Part1) {
 
   EXPECT_EQ(day22_1(&stream), 6032);
 }
+
+TEST(day22, Part2) {
+  // The solution doesn't work with the shape of the test data used for part 1.
+  // This is a simple 9x12 map with the same shape as my input map.
+  std::stringstream stream("   ......\n"
+                           "   .....#\n"
+                           "   ..#...\n"
+                           "   ...\n"
+                           "   ...\n"
+                           "   ...\n"
+                           "......\n"
+                           "..#...\n"
+                           "....#.\n"
+                           "...   \n"
+                           ".#.   \n"
+                           "...   \n"
+                           "\n"
+                           "10R5L5R10L4R5L5\n");
+
+  ASSERT_EQ(day22_2(&stream), 9015);
+}
