@@ -5,6 +5,7 @@
 #include <functional>
 #include <iostream>
 #include <istream>
+#include <optional>
 #include <string>
 #include <unordered_map>
 

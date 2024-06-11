@@ -1,5 +1,7 @@
 #include "aoc22/utils.h"
 
+#include <array>
+#include <cmath>
 #include <istream>
 #include <numeric>
 #include <queue>
