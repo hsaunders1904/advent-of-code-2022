@@ -21,6 +21,7 @@ set(DAYS
   20
   21
   22
+  23
 )
 foreach(day ${DAYS})
   list(APPEND SRC "day${day}.cpp")
