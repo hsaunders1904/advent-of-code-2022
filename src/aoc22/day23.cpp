@@ -2,7 +2,6 @@
 
 #include <algorithm>
 #include <array>
-#include <bitset>
 #include <cstddef>
 #include <istream>
 #include <limits>
@@ -104,6 +103,28 @@ propose_moves(const PointSet &elves, const std::array<int, 4> &direction_priorit
   return {proposed_moves, destination_counter};
 }
 
+std::size_t step(PointSet &elf_coords, std::array<int, 4> &direction_priority) {
+  auto [proposed_moves, dest_ctr] = propose_moves(elf_coords, direction_priority);
+  std::size_t num_moves{0};
+
+  // Move the elves if there are no collisions.
+  PointSet new_elf_coords(elf_coords);
+  for (const auto [src, dest] : proposed_moves) {
+    if (dest_ctr[dest] == 1) {
+      new_elf_coords.erase(src);
+      new_elf_coords.insert(dest);
+      ++num_moves;
+    }
+  }
+  elf_coords = new_elf_coords;
+
+  // Rotate the move priorities.
+  std::rotate(direction_priority.begin(), std::next(direction_priority.begin()),
+              direction_priority.end());
+
+  return num_moves;
+}
+
 int day23_1(std::istream *input_file) {
   auto elf_coords = read_elf_coords(input_file);
 
@@ -111,23 +132,7 @@ int day23_1(std::istream *input_file) {
   std::array<int, 4> direction_priority = {NORTH, SOUTH, WEST, EAST};
 
   for (auto i = 0U; i < n_rounds; ++i) {
-    // Get the proposed moves and a count of how many elves are proposing to
-    // move some position.
-    auto [proposed_moves, dest_ctr] = propose_moves(elf_coords, direction_priority);
-
-    // Move the elves if there are no collisions.
-    PointSet new_elf_coords(elf_coords);
-    for (const auto [src, dest] : proposed_moves) {
-      if (dest_ctr[dest] == 1) {
-        new_elf_coords.erase(src);
-        new_elf_coords.insert(dest);
-      }
-    }
-    elf_coords = new_elf_coords;
-
-    // Rotate the move priorities.
-    std::rotate(direction_priority.begin(), std::next(direction_priority.begin()),
-                direction_priority.end());
+    step(elf_coords, direction_priority);
   }
 
   // Find the bounds of the elf positions, make the smallest rectangle that
@@ -143,4 +148,17 @@ int day23_1(std::istream *input_file) {
   }
   auto area = (x_bounds[1] - x_bounds[0] + 1) * (y_bounds[1] - y_bounds[0] + 1);
   return area - elf_coords.size();
+}
+
+int day23_2(std::istream *input_file) {
+  auto elf_coords = read_elf_coords(input_file);
+  std::array<int, 4> direction_priority = {NORTH, SOUTH, WEST, EAST};
+
+  for (auto i = 0U;; ++i) {
+    auto num_moves = step(elf_coords, direction_priority);
+    if (num_moves == 0) {
+      return i + 1;
+    }
+  }
+  return -1;
 }
